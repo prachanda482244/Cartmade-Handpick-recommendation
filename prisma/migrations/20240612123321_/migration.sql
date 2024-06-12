@@ -1,0 +1,19 @@
+-- CreateTable
+CREATE TABLE "Product" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "title" TEXT NOT NULL,
+    "price" REAL NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "RelatedProduct" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "mainProductId" INTEGER NOT NULL,
+    "relatedProductId" INTEGER NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "test" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+);

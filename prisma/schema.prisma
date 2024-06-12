@@ -31,8 +31,17 @@ model Session {
   emailVerified Boolean?  @default(false)
 }
 
-model Product{
-  id  String @id 
-  relatedProductHandle String 
-  position Int
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  title     String
+  price     Float
+  description String
+  createdAt DateTime @default(now())
+}
+
+model RelatedProduct {
+  id             Int      @id @default(autoincrement())
+  mainProductId  Int
+  relatedProductId Int
 }

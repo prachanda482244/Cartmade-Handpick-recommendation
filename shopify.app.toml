@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://loose-cashiers-wall-loud.trycloudflare.com"
+application_url = "https://fighters-eastern-workplace-delivering.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://loose-cashiers-wall-loud.trycloudflare.com/auth/callback",
-  "https://loose-cashiers-wall-loud.trycloudflare.com/auth/shopify/callback",
-  "https://loose-cashiers-wall-loud.trycloudflare.com/api/auth/callback"
+  "https://fighters-eastern-workplace-delivering.trycloudflare.com/auth/callback",
+  "https://fighters-eastern-workplace-delivering.trycloudflare.com/auth/shopify/callback",
+  "https://fighters-eastern-workplace-delivering.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
