@@ -1,0 +1,29 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
+name = "cartmade-handpickup"
+handle = "cartmade-handpickup"
+application_url = "https://loose-cashiers-wall-loud.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "prachanda-test.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://loose-cashiers-wall-loud.trycloudflare.com/auth/callback",
+  "https://loose-cashiers-wall-loud.trycloudflare.com/auth/shopify/callback",
+  "https://loose-cashiers-wall-loud.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-04"
+
+[pos]
+embedded = false
