@@ -1,21 +1,39 @@
-import { LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  ActionFunction,
+  ActionFunctionArgs,
+  LoaderFunction,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Card, Layout, List, MediaCard, Page } from "@shopify/polaris";
+import {
+  Card,
+  Layout,
+  List,
+  MediaCard,
+  Page,
+  Pagination,
+} from "@shopify/polaris";
 import { Autocomplete, Icon } from "@shopify/polaris";
 import { SearchIcon } from "@shopify/polaris-icons";
 import axios from "axios";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { apiVersion, authenticate } from "~/shopify.server";
 
 export const query = `
 {
-  products(first: 10) {
+  products(first:5) {
+   pageInfo {
+      hasPreviousPage
+      hasNextPage
+      startCursor
+      endCursor
+    }
     edges {
       node {
         id
         title
-        featuredImage{
-        url
+        featuredImage {
+          url
         }
         priceRange {
           minVariantPrice {
@@ -27,17 +45,24 @@ export const query = `
     }
   }
 }
+
 `;
 
 export const loader: LoaderFunction = async ({
   request,
 }: LoaderFunctionArgs) => {
+  console.log("i am loader");
   const { session } = await authenticate.admin(request);
   const { shop, accessToken } = session;
   try {
     const { data } = await axios.post(
       `https://${shop}/admin/api/${apiVersion}/graphql.json`,
       query,
+      // queryFunction(
+      //   "first",
+      //   "after",
+      //   "eyJsYXN0X2lkIjo3OTQ3MTEwMTg3MTgwLCJsYXN0X3ZhbHVlIjoiNzk0NzExMDE4NzE4MCJ9",
+      // ),
       {
         headers: {
           "Content-Type": "application/graphql",
@@ -48,19 +73,25 @@ export const loader: LoaderFunction = async ({
 
     const {
       data: {
-        products: { edges },
+        products: { pageInfo, edges },
       },
     } = data;
-
-    return edges;
+    return { pageInfo, edges, shop, accessToken, apiVersion };
   } catch (error) {
     console.log(error);
   }
   return [];
 };
+
 const Dashboard = () => {
-  const products: any = useLoaderData();
-  console.log(products, "Products");
+  const loaderData: any = useLoaderData();
+  const [pageToken, setPageToken] = useState<string>("");
+  const [prevValue, setPrevValue] = useState<boolean>(true);
+  const [nextValue, setNextValue] = useState<boolean>(true);
+  const [previousPaginationData, setPreviousPaginationData] = useState();
+  const [initialPaginationData, setInitialPaginationData] = useState();
+  const [products, setProducts] = useState([]);
+  const { pageInfo, edges } = loaderData;
 
   const deselectedOptions = useMemo(
     () => [
@@ -75,6 +106,42 @@ const Dashboard = () => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState(deselectedOptions);
+
+  useEffect(() => {
+    setProducts(edges);
+    setPageToken(pageInfo?.endCursor);
+    setPreviousPaginationData(pageInfo);
+  }, []);
+
+  console.log(previousPaginationData, "Previous");
+
+  const handleNextPagination = async () => {
+    console.log(pageToken);
+
+    let response = await fetch(
+      `/api/pagination?firstLastValue=first&afterBeforeValue=after&pageToken=${pageToken}`,
+    );
+    let { data } = await response.json();
+    const { products } = data;
+    const { pageInfo, edges } = products;
+    setInitialPaginationData(pageInfo);
+    setPageToken(pageInfo.endCursor);
+    setNextValue(pageInfo.hasNextPage);
+    setProducts(edges);
+  };
+
+  const handlePrevPagination = async () => {
+    let response = await fetch(
+      `/api/pagination?firstLastValue=last&afterBeforeValue=before&pageToken=${pageToken}`,
+    );
+    let { data } = await response.json();
+    const { products } = data;
+    const { pageInfo, edges } = products;
+    setPreviousPaginationData(pageInfo);
+    setPageToken(pageInfo.endCursor);
+    setPrevValue(pageInfo.hasPreviousPage);
+    setProducts(edges);
+  };
 
   const updateText = useCallback(
     (value: string) => {
@@ -143,10 +210,20 @@ const Dashboard = () => {
         </Layout.Section>
 
         <Layout.Section>
+          <Pagination
+            label="Total products"
+            hasPrevious={prevValue}
+            onPrevious={handlePrevPagination}
+            hasNext={nextValue}
+            onNext={handleNextPagination}
+          />
+        </Layout.Section>
+        <Layout.Section>
           <Card>
             <List type="bullet" gap="loose">
               {products?.map((product: any) => (
                 <MediaCard
+                  key={product.node.title}
                   title={product.node.title}
                   description={product.node.priceRange.minVariantPrice.amount}
                   popoverActions={[{ content: "Dismiss", onAction: () => {} }]}
