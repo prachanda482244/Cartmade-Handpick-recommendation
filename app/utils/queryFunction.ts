@@ -46,7 +46,5 @@ export const queryFunction = ({
     }
     
     `;
-  console.log(query);
-  console.log("Prachanda");
   return query;
 };

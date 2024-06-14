@@ -4,19 +4,24 @@ import { DeleteIcon } from "@shopify/polaris-icons";
 import { useLoaderData } from "@remix-run/react";
 import {
   Box,
+  Button,
   Card,
+  Form,
+  FormLayout,
   IndexTable,
   Layout,
   LegacyCard,
   Page,
+  SkeletonBodyText,
+  SkeletonDisplayText,
+  Spinner,
+  TextContainer,
+  TextField,
   useIndexResourceState,
 } from "@shopify/polaris";
-import { Autocomplete, Icon } from "@shopify/polaris";
-import { SearchIcon } from "@shopify/polaris-icons";
 import axios from "axios";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { apiVersion, authenticate } from "~/shopify.server";
-import { SelectionType } from "@shopify/polaris/build/ts/src/utilities/use-index-resource-state";
 
 export const query = `
 {
@@ -85,6 +90,7 @@ interface pageInfomation {
   hasPreviousPage: boolean;
   hasNextPage: boolean;
 }
+
 const Dashboard = () => {
   const loaderData: any = useLoaderData();
   const [pageInformation, setPageInformation] = useState<pageInfomation>({
@@ -93,20 +99,14 @@ const Dashboard = () => {
     hasNextPage: true,
     hasPreviousPage: false,
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [products, setProducts] = useState([]);
   const { pageInfo, edges } = loaderData;
 
-  const deselectedOptions = useMemo(
-    () => [
-      { value: "rustic", label: "The Collection Snowboard: Liquid" },
-      { value: "headphone", label: "Head Phone" },
-      { value: "vinyl", label: "Short sleeve tshirt" },
-    ],
-    [],
+  const [inputValue, setInputValue] = useState<string>("");
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null,
   );
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [options, setOptions] = useState(deselectedOptions);
 
   useEffect(() => {
     setProducts(edges);
@@ -114,10 +114,12 @@ const Dashboard = () => {
   }, [pageInfo]);
 
   const handleNextPagination = async () => {
+    setIsLoading(true);
     let response = await fetch(
       `/api/pagination?firstLastValue=first&afterBeforeValue=after&pageToken=${pageInformation.endCursor}`,
     );
     let { data } = await response.json();
+    setIsLoading(false);
     const { products } = data;
     const { pageInfo, edges } = products;
     setPageInformation(pageInfo);
@@ -125,64 +127,42 @@ const Dashboard = () => {
   };
 
   const handlePrevPagination = async () => {
+    setIsLoading(true);
     let response = await fetch(
       `/api/pagination?firstLastValue=last&afterBeforeValue=before&pageToken=${pageInformation.startCursor}`,
     );
     let { data } = await response.json();
+    setIsLoading(false);
     const { products } = data;
     const { pageInfo, edges } = products;
     setPageInformation(pageInfo);
     setProducts(edges);
   };
 
-  const updateText = useCallback(
-    (value: string) => {
-      setInputValue(value);
-
-      if (value === "") {
-        setOptions(deselectedOptions);
-        return;
-      }
-
-      const filterRegex = new RegExp(value, "i");
-      const resultOptions = deselectedOptions.filter((option) =>
-        option.label.match(filterRegex),
+  const handleSubmit = async () => {
+    console.log("api call");
+    try {
+      setIsLoading(true);
+      let response = await fetch(
+        `/api/search?firstLastValue=first&searchQuery=${inputValue}`,
       );
-      setOptions(resultOptions);
-    },
-    [deselectedOptions],
-  );
-
-  const updateSelection = useCallback(
-    (selected: string[]) => {
-      const selectedValue = selected.map((selectedItem) => {
-        const matchedOption = options.find((option) => {
-          return option.value.match(selectedItem);
-        });
-        return matchedOption && matchedOption.label;
-      });
-
-      setSelectedOptions(selected);
-      setInputValue(selectedValue[0] || "");
-    },
-    [options],
-  );
-
-  const textField = (
-    <Autocomplete.TextField
-      onChange={updateText}
-      label="Search Products"
-      value={inputValue}
-      prefix={<Icon source={SearchIcon} tone="base" />}
-      placeholder="Search"
-      autoComplete="off"
-    />
-  );
+      const { data } = await response.json();
+      const { products } = data;
+      const { pageInfo, edges } = products;
+      setPageInformation(pageInfo);
+      setProducts(edges);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const resourceIDResolver = (product: any) => product.node.id;
 
-  const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(products, { resourceIDResolver });
+  const { selectedResources, allResourcesSelected } = useIndexResourceState(
+    products,
+    { resourceIDResolver },
+  );
 
   const promotedBulkActions = [
     // {
@@ -209,30 +189,36 @@ const Dashboard = () => {
   ];
   const bulkActions = [
     {
-      content: "Add tags",
+      content: "Sort [A-Z]",
       onAction: () => console.log("Todo: implement bulk add tags"),
     },
     {
-      content: "Remove tags",
+      content: "Sort [Z-A]",
+      onAction: () => console.log("Todo: implement bulk add tags"),
+    },
+    {
+      content: "Sort [0 -9]",
       onAction: () => console.log("Todo: implement bulk remove tags"),
     },
     {
-      icon: DeleteIcon,
-      destructive: true,
-      content: "Delete customers",
-      onAction: () => console.log("Todo: implement bulk delete"),
+      content: "Sort assending",
+      onAction: () => console.log("Todo: implement bulk remove tags"),
+    },
+    {
+      content: "Sort Desending",
+      onAction: () => console.log("Todo: implement bulk remove tags"),
     },
   ];
 
   const rowMarkup = products.map((product: any, index) => {
     const { id, priceRange, title, featuredImage, vendor, createdAt } =
       product.node;
-
     return (
       <IndexTable.Row
         id={id}
         key={id}
-        selected={selectedResources.includes(id)}
+        selected={id === selectedProductId}
+        onClick={() => setSelectedProductId(id)}
         position={index}
       >
         <IndexTable.Cell>{title}</IndexTable.Cell>
@@ -242,10 +228,22 @@ const Dashboard = () => {
         </IndexTable.Cell>
         <IndexTable.Cell>{priceRange?.minVariantPrice?.amount}</IndexTable.Cell>
         <IndexTable.Cell>{vendor}</IndexTable.Cell>
-        <IndexTable.Cell>N/a</IndexTable.Cell>
       </IndexTable.Row>
     );
   });
+
+  const handleChange = async (value: string) => {
+    setInputValue(value);
+  };
+
+  const handleSelectionChange = (selected: string[] | any) => {
+    if (selected.length === 0) {
+      // Clear selection if no items are selected
+      setSelectedProductId(null);
+      return;
+    }
+    setSelectedProductId(selected[0]);
+  };
   // console.log(products);
   return (
     <Page>
@@ -255,21 +253,20 @@ const Dashboard = () => {
         </Layout.Section>
 
         <Layout.Section>
-          <div
-            style={{
-              height: "px",
-              position: "absolute",
-              top: "8px",
-              right: "380px",
-            }}
-          >
-            <Autocomplete
-              options={options}
-              selected={selectedOptions}
-              onSelect={updateSelection}
-              textField={textField}
-            />
-          </div>
+          <Form noValidate onSubmit={handleSubmit}>
+            <FormLayout>
+              <TextField
+                label
+                value={inputValue}
+                onChange={(value) => handleChange(value)}
+                placeholder="Search products"
+                type="search"
+                autoComplete="off"
+              />
+
+              <Button submit>Search</Button>
+            </FormLayout>
+          </Form>
         </Layout.Section>
         <Layout.Section>
           <Card>
@@ -293,7 +290,6 @@ const Dashboard = () => {
                   { title: "Product" },
                   { title: "Total", alignment: "end" },
                   { title: "Vendor" },
-                  { title: "Fulfillment status" },
                 ]}
                 pagination={{
                   hasNext: pageInformation.hasNextPage,
@@ -307,7 +303,16 @@ const Dashboard = () => {
                   label: "Total products",
                 }}
               >
-                {rowMarkup}
+                {isLoading ? (
+                  <div className="text-2xl flex items-center justify-center h-40 w-[55vw] mx-auto">
+                    <Spinner
+                      accessibilityLabel="Spinner example"
+                      size="large"
+                    />
+                  </div>
+                ) : (
+                  rowMarkup
+                )}
               </IndexTable>
             </Box>
           </Card>
