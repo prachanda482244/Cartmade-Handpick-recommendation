@@ -1,9 +1,4 @@
-interface query {
-  firstLastValue: string | any;
-  afterBeforeValue?: string | any;
-  pageToken?: string | any;
-  searchQuery?: string | any;
-}
+import { query } from "~/config/typeConfig";
 
 export const queryFunction = ({
   firstLastValue,

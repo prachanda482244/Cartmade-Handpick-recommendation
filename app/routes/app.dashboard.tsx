@@ -6,23 +6,19 @@ import {
   Box,
   Button,
   Card,
-  Collapsible,
   Form,
   FormLayout,
   IndexTable,
   Layout,
-  LegacyCard,
   Page,
-  SkeletonBodyText,
-  SkeletonDisplayText,
   Spinner,
-  TextContainer,
   TextField,
   useIndexResourceState,
 } from "@shopify/polaris";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { apiVersion, authenticate } from "~/shopify.server";
+import { pageInfomation } from "~/config/typeConfig";
 
 export const query = `
 {
@@ -84,13 +80,6 @@ export const loader: LoaderFunction = async ({
   }
   return [];
 };
-
-interface pageInfomation {
-  endCursor: string;
-  startCursor: string;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
 
 const Dashboard = () => {
   const loaderData: any = useLoaderData();
