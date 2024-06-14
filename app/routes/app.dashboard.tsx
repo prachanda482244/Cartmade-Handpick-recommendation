@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Card,
+  Collapsible,
   Form,
   FormLayout,
   IndexTable,
@@ -214,21 +215,35 @@ const Dashboard = () => {
     const { id, priceRange, title, featuredImage, vendor, createdAt } =
       product.node;
     return (
-      <IndexTable.Row
-        id={id}
-        key={id}
-        selected={id === selectedProductId}
-        onClick={() => setSelectedProductId(id)}
-        position={index}
-      >
-        <IndexTable.Cell>{title}</IndexTable.Cell>
-        <IndexTable.Cell>{createdAt}</IndexTable.Cell>
-        <IndexTable.Cell>
-          <img src={featuredImage?.url} alt="Products" height={40} width={60} />
-        </IndexTable.Cell>
-        <IndexTable.Cell>{priceRange?.minVariantPrice?.amount}</IndexTable.Cell>
-        <IndexTable.Cell>{vendor}</IndexTable.Cell>
-      </IndexTable.Row>
+      <>
+        <IndexTable.Row
+          key={id}
+          id={id}
+          selected={id === selectedProductId}
+          onClick={() => setSelectedProductId(id)}
+          position={index}
+        >
+          <IndexTable.Cell>{title}</IndexTable.Cell>
+          <IndexTable.Cell>{createdAt}</IndexTable.Cell>
+          <IndexTable.Cell>
+            <img
+              src={featuredImage?.url}
+              alt="Products"
+              height={40}
+              width={60}
+            />
+          </IndexTable.Cell>
+          <IndexTable.Cell>
+            {priceRange?.minVariantPrice?.amount}
+          </IndexTable.Cell>
+          <IndexTable.Cell>{vendor}</IndexTable.Cell>
+        </IndexTable.Row>
+        <div>
+          {selectedProductId === id ? (
+            <div className="text-2xl font-bold">bye bye</div>
+          ) : null}
+        </div>
+      </>
     );
   });
 
@@ -238,12 +253,12 @@ const Dashboard = () => {
 
   const handleSelectionChange = (selected: string[] | any) => {
     if (selected.length === 0) {
-      // Clear selection if no items are selected
       setSelectedProductId(null);
       return;
     }
     setSelectedProductId(selected[0]);
   };
+  console.log(selectedProductId);
   // console.log(products);
   return (
     <Page>
@@ -255,16 +270,20 @@ const Dashboard = () => {
         <Layout.Section>
           <Form noValidate onSubmit={handleSubmit}>
             <FormLayout>
-              <TextField
-                label
-                value={inputValue}
-                onChange={(value) => handleChange(value)}
-                placeholder="Search products"
-                type="search"
-                autoComplete="off"
-              />
+              <div className="flex items-center gap-2">
+                <TextField
+                  label
+                  value={inputValue}
+                  onChange={(value) => handleChange(value)}
+                  placeholder="Search products"
+                  type="search"
+                  autoComplete="off"
+                />
 
-              <Button submit>Search</Button>
+                <Button variant="secondary" submit>
+                  Search
+                </Button>
+              </div>
             </FormLayout>
           </Form>
         </Layout.Section>
@@ -288,7 +307,7 @@ const Dashboard = () => {
                   { title: "Title" },
                   { title: "Date" },
                   { title: "Product" },
-                  { title: "Total", alignment: "end" },
+                  { title: "Total" },
                   { title: "Vendor" },
                 ]}
                 pagination={{
