@@ -1,27 +1,26 @@
-import {
-  ActionFunction,
-  ActionFunctionArgs,
-  LoaderFunction,
-  LoaderFunctionArgs,
-} from "@remix-run/node";
+import { LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { DeleteIcon } from "@shopify/polaris-icons";
+
 import { useLoaderData } from "@remix-run/react";
 import {
+  Box,
   Card,
+  IndexTable,
   Layout,
-  List,
-  MediaCard,
+  LegacyCard,
   Page,
-  Pagination,
+  useIndexResourceState,
 } from "@shopify/polaris";
 import { Autocomplete, Icon } from "@shopify/polaris";
 import { SearchIcon } from "@shopify/polaris-icons";
 import axios from "axios";
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { apiVersion, authenticate } from "~/shopify.server";
+import { SelectionType } from "@shopify/polaris/build/ts/src/utilities/use-index-resource-state";
 
 export const query = `
 {
-  products(first:5) {
+  products(first:10) {
    pageInfo {
       hasPreviousPage
       hasNextPage
@@ -32,6 +31,8 @@ export const query = `
       node {
         id
         title
+        createdAt
+     		vendor
         featuredImage {
           url
         }
@@ -58,11 +59,6 @@ export const loader: LoaderFunction = async ({
     const { data } = await axios.post(
       `https://${shop}/admin/api/${apiVersion}/graphql.json`,
       query,
-      // queryFunction(
-      //   "first",
-      //   "after",
-      //   "eyJsYXN0X2lkIjo3OTQ3MTEwMTg3MTgwLCJsYXN0X3ZhbHVlIjoiNzk0NzExMDE4NzE4MCJ9",
-      // ),
       {
         headers: {
           "Content-Type": "application/graphql",
@@ -83,23 +79,28 @@ export const loader: LoaderFunction = async ({
   return [];
 };
 
+interface pageInfomation {
+  endCursor: string;
+  startCursor: string;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
 const Dashboard = () => {
   const loaderData: any = useLoaderData();
-  const [pageToken, setPageToken] = useState<string>("");
-  const [prevValue, setPrevValue] = useState<boolean>(true);
-  const [nextValue, setNextValue] = useState<boolean>(true);
-  const [previousPaginationData, setPreviousPaginationData] = useState();
-  const [initialPaginationData, setInitialPaginationData] = useState();
+  const [pageInformation, setPageInformation] = useState<pageInfomation>({
+    endCursor: "",
+    startCursor: "",
+    hasNextPage: true,
+    hasPreviousPage: false,
+  });
   const [products, setProducts] = useState([]);
   const { pageInfo, edges } = loaderData;
 
   const deselectedOptions = useMemo(
     () => [
-      { value: "rustic", label: "Rustic" },
-      { value: "antique", label: "Antique" },
-      { value: "vinyl", label: "Vinyl" },
-      { value: "vintage", label: "Vintage" },
-      { value: "refurbished", label: "Refurbished" },
+      { value: "rustic", label: "The Collection Snowboard: Liquid" },
+      { value: "headphone", label: "Head Phone" },
+      { value: "vinyl", label: "Short sleeve tshirt" },
     ],
     [],
   );
@@ -109,37 +110,28 @@ const Dashboard = () => {
 
   useEffect(() => {
     setProducts(edges);
-    setPageToken(pageInfo?.endCursor);
-    setPreviousPaginationData(pageInfo);
-  }, []);
-
-  console.log(previousPaginationData, "Previous");
+    setPageInformation(pageInfo);
+  }, [pageInfo]);
 
   const handleNextPagination = async () => {
-    console.log(pageToken);
-
     let response = await fetch(
-      `/api/pagination?firstLastValue=first&afterBeforeValue=after&pageToken=${pageToken}`,
+      `/api/pagination?firstLastValue=first&afterBeforeValue=after&pageToken=${pageInformation.endCursor}`,
     );
     let { data } = await response.json();
     const { products } = data;
     const { pageInfo, edges } = products;
-    setInitialPaginationData(pageInfo);
-    setPageToken(pageInfo.endCursor);
-    setNextValue(pageInfo.hasNextPage);
+    setPageInformation(pageInfo);
     setProducts(edges);
   };
 
   const handlePrevPagination = async () => {
     let response = await fetch(
-      `/api/pagination?firstLastValue=last&afterBeforeValue=before&pageToken=${pageToken}`,
+      `/api/pagination?firstLastValue=last&afterBeforeValue=before&pageToken=${pageInformation.startCursor}`,
     );
     let { data } = await response.json();
     const { products } = data;
     const { pageInfo, edges } = products;
-    setPreviousPaginationData(pageInfo);
-    setPageToken(pageInfo.endCursor);
-    setPrevValue(pageInfo.hasPreviousPage);
+    setPageInformation(pageInfo);
     setProducts(edges);
   };
 
@@ -186,6 +178,75 @@ const Dashboard = () => {
       autoComplete="off"
     />
   );
+
+  const resourceIDResolver = (product: any) => product.node.id;
+
+  const { selectedResources, allResourcesSelected, handleSelectionChange } =
+    useIndexResourceState(products, { resourceIDResolver });
+
+  const promotedBulkActions = [
+    // {
+    //   content: "Capture payments",
+    //   onAction: () => console.log("Todo: implement payment capture"),
+    // },
+    {
+      title: "Add Selected Products",
+      actions: [
+        {
+          content: "Add  Products",
+          onAction: () => console.log("Todo: implement adding customers"),
+        },
+        {
+          icon: DeleteIcon,
+          destructive: true,
+          content: "Delete Products",
+          onAction: () => {
+            console.log(selectedResources);
+          },
+        },
+      ],
+    },
+  ];
+  const bulkActions = [
+    {
+      content: "Add tags",
+      onAction: () => console.log("Todo: implement bulk add tags"),
+    },
+    {
+      content: "Remove tags",
+      onAction: () => console.log("Todo: implement bulk remove tags"),
+    },
+    {
+      icon: DeleteIcon,
+      destructive: true,
+      content: "Delete customers",
+      onAction: () => console.log("Todo: implement bulk delete"),
+    },
+  ];
+
+  const rowMarkup = products.map((product: any, index) => {
+    const { id, priceRange, title, featuredImage, vendor, createdAt } =
+      product.node;
+
+    return (
+      <IndexTable.Row
+        id={id}
+        key={id}
+        selected={selectedResources.includes(id)}
+        position={index}
+      >
+        <IndexTable.Cell>{title}</IndexTable.Cell>
+        <IndexTable.Cell>{createdAt}</IndexTable.Cell>
+        <IndexTable.Cell>
+          <img src={featuredImage?.url} alt="Products" height={40} width={60} />
+        </IndexTable.Cell>
+        <IndexTable.Cell>{priceRange?.minVariantPrice?.amount}</IndexTable.Cell>
+        <IndexTable.Cell>{vendor}</IndexTable.Cell>
+        <IndexTable.Cell>N/a</IndexTable.Cell>
+      </IndexTable.Row>
+    );
+  });
+  // console.log(products);
   return (
     <Page>
       <Layout>
@@ -194,7 +255,14 @@ const Dashboard = () => {
         </Layout.Section>
 
         <Layout.Section>
-          <div style={{ height: "225px" }}>
+          <div
+            style={{
+              height: "px",
+              position: "absolute",
+              top: "8px",
+              right: "380px",
+            }}
+          >
             <Autocomplete
               options={options}
               selected={selectedOptions}
@@ -208,43 +276,40 @@ const Dashboard = () => {
             <h1>All products</h1>
           </Card>
         </Layout.Section>
-
-        <Layout.Section>
-          <Pagination
-            label="Total products"
-            hasPrevious={prevValue}
-            onPrevious={handlePrevPagination}
-            hasNext={nextValue}
-            onNext={handleNextPagination}
-          />
-        </Layout.Section>
         <Layout.Section>
           <Card>
-            <List type="bullet" gap="loose">
-              {products?.map((product: any) => (
-                <MediaCard
-                  key={product.node.title}
-                  title={product.node.title}
-                  description={product.node.priceRange.minVariantPrice.amount}
-                  popoverActions={[{ content: "Dismiss", onAction: () => {} }]}
-                >
-                  <img
-                    alt={product.node.title}
-                    width="100%"
-                    height="100%"
-                    style={{
-                      objectFit: "cover",
-                      objectPosition: "center",
-                    }}
-                    src={
-                      product.node.featuredImage?.url !== ""
-                        ? product.node.featuredImage?.url
-                        : ""
-                    }
-                  />
-                </MediaCard>
-              ))}
-            </List>
+            <Box paddingBlockEnd="400">
+              <IndexTable
+                itemCount={products?.length}
+                selectedItemsCount={
+                  allResourcesSelected ? "All" : selectedResources.length
+                }
+                bulkActions={bulkActions}
+                promotedBulkActions={promotedBulkActions}
+                onSelectionChange={handleSelectionChange}
+                headings={[
+                  { title: "Title" },
+                  { title: "Date" },
+                  { title: "Product" },
+                  { title: "Total", alignment: "end" },
+                  { title: "Vendor" },
+                  { title: "Fulfillment status" },
+                ]}
+                pagination={{
+                  hasNext: pageInformation.hasNextPage,
+                  hasPrevious: pageInformation.hasPreviousPage,
+                  onNext: () => {
+                    handleNextPagination();
+                  },
+                  onPrevious: () => {
+                    handlePrevPagination();
+                  },
+                  label: "Total products",
+                }}
+              >
+                {rowMarkup}
+              </IndexTable>
+            </Box>
           </Card>
         </Layout.Section>
       </Layout>

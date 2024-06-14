@@ -4,21 +4,20 @@ import { authenticate } from "~/shopify.server";
 import { queryFunction } from "~/utils/queryFunction";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const firstLastValue = url.searchParams.get("firstLastValue");
-  const afterBeforeValue = url.searchParams.get("afterBeforeValue");
-  const pageToken = url.searchParams.get("pageToken");
-
-  const { session } = await authenticate.admin(request);
-  const { shop, accessToken } = session;
-
   try {
+    const url = new URL(request.url);
+    const firstLastValue = url.searchParams.get("firstLastValue");
+    const searchQuery = url.searchParams.get("searchQuery");
+    console.log(searchQuery, "search value");
+
+    const { session } = await authenticate.admin(request);
+    const { shop, accessToken } = session;
+
     const { data } = await axios.post(
       `https://${shop}/admin/api/graphql.json`,
       queryFunction({
         firstLastValue: firstLastValue,
-        afterBeforeValue: afterBeforeValue,
-        pageToken: pageToken,
+        searchQuery: searchQuery,
       }),
       {
         headers: {
@@ -28,9 +27,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     );
 
-    return json(data);
+    return json({ search: searchQuery, data: data });
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return json({ success: false, message: "Error fetching data" });
+    console.error(error);
   }
 }

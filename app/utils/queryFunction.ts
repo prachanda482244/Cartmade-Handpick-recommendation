@@ -1,11 +1,24 @@
-export const queryFunction = (
-  firstLastValue: string | any,
-  afterBeforeValue: string | any,
-  pageToken: string | any,
-) => {
+interface query {
+  firstLastValue: string | any;
+  afterBeforeValue?: string | any;
+  pageToken?: string | any;
+  searchQuery?: string | any;
+}
+
+export const queryFunction = ({
+  firstLastValue,
+  afterBeforeValue,
+  pageToken,
+  searchQuery,
+}: query) => {
+  console.log(searchQuery);
+  const condition =
+    searchQuery !== undefined
+      ? `query:"${searchQuery}"`
+      : `${afterBeforeValue}:"${pageToken}"`;
   const query = `
     {
-      products(${firstLastValue}:5, ${afterBeforeValue}:"${pageToken}"  ) {
+      products(${firstLastValue}:10, ${condition}  ) {
        pageInfo {
           hasPreviousPage
           hasNextPage
@@ -16,6 +29,8 @@ export const queryFunction = (
           node {
             id
             title
+            createdAt
+     		    vendor
             featuredImage {
               url
             }
