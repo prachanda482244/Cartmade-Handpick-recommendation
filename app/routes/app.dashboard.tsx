@@ -9,18 +9,15 @@ import {
   FormLayout,
   IndexTable,
   Layout,
-  LegacyCard,
   Page,
-  Scrollable,
   Spinner,
   TextField,
   useIndexResourceState,
 } from "@shopify/polaris";
 import axios from "axios";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { apiVersion, authenticate } from "~/shopify.server";
 import { pageInfomation } from "~/config/typeConfig";
-import lodash from "lodash";
 export const query = `
 {
   products(first:10) {
@@ -54,9 +51,9 @@ export const query = `
 export const loader: LoaderFunction = async ({
   request,
 }: LoaderFunctionArgs) => {
-  console.log("i am loader");
   const { session } = await authenticate.admin(request);
   const { shop, accessToken } = session;
+
   try {
     const { data } = await axios.post(
       `https://${shop}/admin/api/${apiVersion}/graphql.json`,
@@ -91,11 +88,8 @@ const Dashboard = () => {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [products, setProducts] = useState<any>([]);
-  const [searchProducts, setSearchProducts] = useState<any>([]);
   const { pageInfo, edges } = loaderData;
-
   const [inputValue, setInputValue] = useState<string>("");
-  const [insideInputValue, setInsideInputValue] = useState<string>("");
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null,
   );
@@ -141,9 +135,7 @@ const Dashboard = () => {
       const { products } = data;
       const { pageInfo, edges } = products;
       setPageInformation(pageInfo);
-      insideInputValue === inputValue
-        ? setProducts(edges)
-        : setSearchProducts(edges);
+      setProducts(edges);
       setIsLoading(false);
     } catch (error) {
       console.log(error);
@@ -206,7 +198,6 @@ const Dashboard = () => {
   ];
 
   const handleToggleAccordion = (productId: string) => {
-    console.log(productId, "Product id");
     setSelectedProductId(selectedProductId === productId ? null : productId);
     setIsVisible(false);
   };
@@ -216,11 +207,18 @@ const Dashboard = () => {
   };
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
-  const handleAddRelatedProduct = () => {
-    setSearchProducts(products);
-    setIsVisible(true);
+  const handleAddRelatedProduct = async () => {
+    const selected = await shopify.resourcePicker({
+      type: "product",
+      multiple: 4,
+      filter: {
+        variants: false,
+        archived: false,
+        draft: false,
+      },
+    });
+    console.log(selected, "app bridge");
   };
-
   const rowMarkup = products.map((product: any, index: number) => {
     const { id, priceRange, title, featuredImage, vendor, createdAt } =
       product.node;
@@ -252,7 +250,7 @@ const Dashboard = () => {
         </IndexTable.Row>
 
         {isExpanded && (
-          <div className="border w-[50vw]">
+          <div className="border w-[30vw]">
             <div>{title}</div>
             <div>
               {!isVisible && (
@@ -262,59 +260,6 @@ const Dashboard = () => {
                 >
                   Addd related product
                 </button>
-              )}
-
-              {isVisible && (
-                <div className=" h-96 flex flex-col gap-3 mt-2 w-full z-[9999] text-whiten">
-                  <div className="flex items-center gap-2">
-                    <Form
-                      noValidate
-                      onSubmit={() => handleSubmit(insideInputValue)}
-                    >
-                      <FormLayout>
-                        <div className="flex items-center gap-2">
-                          <TextField
-                            label=""
-                            value={insideInputValue}
-                            onChange={(value) => setInsideInputValue(value)}
-                            placeholder="Search "
-                            type="search"
-                            autoComplete="off"
-                          />
-
-                          <Button variant="secondary" submit>
-                            Search
-                          </Button>
-                        </div>
-                      </FormLayout>
-                    </Form>
-                  </div>
-                  <Scrollable shadow style={{ height: "350px" }}>
-                    {searchProducts?.map((product: any, index: number) => (
-                      <div
-                        onClick={() => handleClick(product.node.id)}
-                        key={product.node.id}
-                        className="flex border p-3 hover:bg-slate-300 cursor-pointer"
-                      >
-                        {isLoading ? (
-                          "Loading"
-                        ) : (
-                          <>
-                            <div>{index + 1}</div>
-                            {product.node.title}
-                            {product.node.vendor}
-                            <img
-                              src={product.node.featuredImage?.url}
-                              alt="product"
-                              height={20}
-                              width={20}
-                            />
-                          </>
-                        )}
-                      </div>
-                    ))}
-                  </Scrollable>
-                </div>
               )}
             </div>
           </div>
@@ -391,7 +336,7 @@ const Dashboard = () => {
                   label: "Total products",
                 }}
               >
-                {inputValue && isLoading ? (
+                {isLoading ? (
                   <div className="text-2xl flex items-center justify-center h-40 w-[55vw] mx-auto">
                     <Spinner
                       accessibilityLabel="Loading spinner"
