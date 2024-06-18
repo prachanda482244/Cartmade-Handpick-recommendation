@@ -30,6 +30,16 @@ export const query = `
     edges {
       node {
         id
+         metafields(first: 10) { 
+            edges {
+              node {
+                id
+                namespace
+                key
+                value
+              }
+            }
+          }
         title
         createdAt
         vendor
@@ -94,6 +104,7 @@ const Dashboard = () => {
     null,
   );
 
+  console.log(edges);
   useEffect(() => {
     setProducts(edges);
     setPageInformation(pageInfo);
@@ -141,10 +152,6 @@ const Dashboard = () => {
       console.log(error);
     }
   };
-
-  // const debouncedSearch = useCallback(lodash.debounce(handleSubmit, 500), [
-  //   inputValue,
-  // ]);
 
   const resourceIDResolver = (product: any) => product.node.id;
 
@@ -208,22 +215,52 @@ const Dashboard = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const handleAddRelatedProduct = async () => {
-    const selected = await shopify.resourcePicker({
-      type: "product",
-      multiple: 4,
-      filter: {
-        variants: false,
-        archived: false,
-        draft: false,
-      },
-    });
-    console.log(selected, "app bridge");
+    try {
+      // Use Shopify App Bridge to pick products
+      const selected = await shopify.resourcePicker({
+        type: "product",
+        multiple: 4,
+        filter: {
+          variants: false,
+          archived: false,
+          draft: false,
+        },
+      });
+
+      // Extract and map the product IDs to an array
+      const productIds = selected?.map(({ id }) => id);
+
+      // Serialize the product IDs into a query string format
+      const queryString = productIds
+        ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
+        .join("&");
+
+      // Send the request to the server
+      // const response = await fetch(
+      //   `/api/meta?${queryString}&mainProductId=${selectedProductId}`,
+      // );
+      const parts: any = selectedProductId?.split("/");
+      const productId = parseInt(parts[parts.length - 1]);
+      console.log(productId);
+      const response = await fetch(
+        `/api/metafield?${queryString}&mainProductId=${productId}`,
+      );
+
+      // Handle the server response
+      const data = await response.json();
+      console.log("Metafield data:", data);
+    } catch (error) {
+      console.error(
+        "Error selecting products or fetching metafield data:",
+        error,
+      );
+    }
   };
+
   const rowMarkup = products.map((product: any, index: number) => {
     const { id, priceRange, title, featuredImage, vendor, createdAt } =
       product.node;
     const isExpanded = selectedProductId === id;
-
     return (
       <>
         <IndexTable.Row
@@ -314,6 +351,7 @@ const Dashboard = () => {
           <Card>
             <Box paddingBlockEnd="400">
               <IndexTable
+                key={1}
                 itemCount={products?.length}
                 selectedItemsCount={
                   allResourcesSelected ? "All" : selectedResources.length
