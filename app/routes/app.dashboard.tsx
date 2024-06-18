@@ -30,7 +30,7 @@ export const query = `
     edges {
       node {
         id
-         metafields(first: 10) { 
+         metafields(first:1 , keys:["custom.recommended_produccts"]) { 
             edges {
               node {
                 id
@@ -104,7 +104,6 @@ const Dashboard = () => {
     null,
   );
 
-  console.log(edges);
   useEffect(() => {
     setProducts(edges);
     setPageInformation(pageInfo);
@@ -203,10 +202,23 @@ const Dashboard = () => {
       onAction: () => console.log("Todo: implement bulk remove tags"),
     },
   ];
-
-  const handleToggleAccordion = (productId: string) => {
+  const [metaFieldId, setMetaFieldId] = useState<string>("");
+  const handleToggleAccordion = async (productId: string, metafieldId: any) => {
     setSelectedProductId(selectedProductId === productId ? null : productId);
+    setMetaFieldId(metaFieldId === metafieldId ? null : metafieldId);
     setIsVisible(false);
+    const parts: any = selectedProductId?.split("/");
+    const product_id = parts[parts?.length - 1];
+    console.log(metafieldId, "recevemeif");
+    const parts2: any = metaFieldId?.split("/");
+    const metaId = parts2 && parts2[parts2?.length - 1];
+    console.log(productId, "pid");
+    console.log(metaId, "mid");
+    const response = await fetch(
+      `/api/fetchmetafield?productId=${product_id}&metaFieldId=${metaId}`,
+    );
+    const data = await response.json();
+    console.log(data);
   };
 
   const handleSelectionChange = (selected: string[] | any) => {
@@ -258,8 +270,20 @@ const Dashboard = () => {
   };
 
   const rowMarkup = products.map((product: any, index: number) => {
-    const { id, priceRange, title, featuredImage, vendor, createdAt } =
-      product.node;
+    const {
+      id,
+      priceRange,
+      title,
+      metafields,
+      featuredImage,
+      vendor,
+      createdAt,
+    } = product.node;
+    const { edges } = metafields;
+    let metafieldId: any;
+    if (edges.length) {
+      metafieldId = edges[0].node.id;
+    }
     const isExpanded = selectedProductId === id;
     return (
       <>
@@ -267,7 +291,7 @@ const Dashboard = () => {
           key={id}
           id={id}
           selected={isExpanded}
-          onClick={() => handleToggleAccordion(id)}
+          onClick={() => handleToggleAccordion(id, metafieldId)}
           position={index}
         >
           <IndexTable.Cell className="border">{title}</IndexTable.Cell>
