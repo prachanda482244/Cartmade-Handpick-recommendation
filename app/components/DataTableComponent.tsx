@@ -130,34 +130,42 @@ const DataTableComponent = ({
     return (
       <>
         <tr
-          className="hover:bg-gray-200 cursor-pointer"
+          className="hover:bg-gray-200 cursor-pointer "
           key={id}
           onClick={() => handleClick(id, metafieldId)}
         >
-          <td className="py-2 px-4 flex items-center border-b border-gray-200">
+          <td className="py-2 px-4 flex items-center bodrder-b border-gray-200">
             <img src={featuredImage?.url} alt="Product" className="w-10 h-10" />
             {title}
           </td>
-          <td className="py-2 px-4 border-b border-gray-200">
+          <td className="py-2 px-4 bordder-b border-gray-200">
             <span className="bg-green-200 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
               {status}
             </span>
           </td>
-          <td className="py-2 px-4 border-b border-gray-200 text-red-600">
+          <td className="py-2 px-4 bordder-b border-gray-200 text-red-600">
             {totalInventory}
           </td>
-          <td className="py-2 px-4 border-b border-gray-200">
+          <td className="py-2 px-4 bordedr-b border-gray-200">
             {priceRange?.minVariantPrice?.amount}
           </td>
-          <td className="py-2 px-4 border-b border-gray-200">{createdAt}</td>
-          <td className="py-2 px-4 border-b border-gray-200">{vendor}</td>
+          <td className="py-2 px-4 bordder-b border-gray-200">{createdAt}</td>
+          <td className="py-2 px-4 bordedr-b border-gray-200">{vendor}</td>
         </tr>
-        <tr className="border flex justify-center border-red-900">
-          <div className="border mx-auto">
-            <td className="py-2 px-4 border-b border-gray-200">{createdAt}</td>
-            <td className="py-2 px-4 border-b border-gray-200">{vendor}</td>
-          </div>
-        </tr>
+        {isExpanded ? (
+          <tr className="border-b border-gray-200  w-100">
+            <td className="w-box-new" colSpan={6}>
+              <div className="bordefr mx-auto flex justify-center">
+                <div className="py-2 px-4 bordecr-b border-gray-200">
+                  {createdAt}
+                </div>
+                <div className="py-2 px-4 borcder-b border-gray-200">
+                  {vendor}
+                </div>
+              </div>
+            </td>
+          </tr>
+        ) : null}
       </>
     );
   });
