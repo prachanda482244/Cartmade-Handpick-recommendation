@@ -2,31 +2,75 @@ import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { authenticate } from "~/shopify.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const productId: any = url.searchParams.get("productId");
-  const metafieldId: any = url.searchParams.get("metaFieldId");
+  try {
+    const url = new URL(request.url);
+    const productId = url.searchParams.get("productId");
+    const metafieldId = url.searchParams.get("metaFieldId");
 
-  const { session, admin } = await authenticate.admin(request);
-  const data = await admin.rest.resources.Metafield.find({
-    session: session,
-    product_id: parseInt(productId),
-    id: parseInt(metafieldId),
-  });
+    if (!productId || !metafieldId) {
+      return json(
+        { success: false, message: "Product ID or Metafield ID is missing" },
+        { status: 400 },
+      );
+    }
 
-  console.log(data.value);
-  //   const response = await admin.graphql(
-  //     `#graphql
-  //       query {
-  //         product(id: ${data?.value[0]}) {
-  //           title
-  //           description
-  //           onlineStoreUrl
-  //         }
-  //       }`,
-  //   );
-  return json({
-    success: true,
-    data: data,
-    message: "Product details",
-  });
+    const { session, admin } = await authenticate.admin(request);
+
+    const metafieldData: any = await admin.rest.resources.Metafield.find({
+      session,
+      product_id: parseInt(productId),
+      id: parseInt(metafieldId),
+    });
+
+    const productQueryIds = JSON.parse(metafieldData?.value || "[]");
+    if (!Array.isArray(productQueryIds) || productQueryIds.length === 0) {
+      return json({
+        success: false,
+        data: [],
+        message: "No product IDs found in metafield",
+      });
+    }
+
+    // Construct the GraphQL query
+    const productQueries = productQueryIds
+      .map(
+        (id, index) => `
+          product${index}: product(id: "${id}") {
+        id
+        title
+        description
+        onlineStoreUrl
+      }
+    `,
+      )
+      .join("\n");
+
+    const graphqlQuery = `
+      query {
+        ${productQueries}
+      }
+    `;
+
+    const response = await admin.graphql(graphqlQuery);
+    const productDetails: any = await response.json();
+    const products = Object.values(productDetails);
+    const productArray = products.map((productArr: any) =>
+      Object.values(productArr),
+    );
+    return json({
+      success: true,
+      data: productArray,
+      message: "Product details fetched successfully",
+    });
+  } catch (error: any) {
+    console.error("Error fetching product details:", error.message);
+    return json(
+      {
+        success: false,
+        message: "Failed to fetch product details",
+        error: error.message,
+      },
+      { status: 500 },
+    );
+  }
 }

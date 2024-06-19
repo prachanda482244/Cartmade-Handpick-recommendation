@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://gilbert-matthew-bidding-toshiba.trycloudflare.com"
+application_url = "https://struct-tissue-jamaica-margin.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://gilbert-matthew-bidding-toshiba.trycloudflare.com/auth/callback",
-  "https://gilbert-matthew-bidding-toshiba.trycloudflare.com/auth/shopify/callback",
-  "https://gilbert-matthew-bidding-toshiba.trycloudflare.com/api/auth/callback"
+  "https://struct-tissue-jamaica-margin.trycloudflare.com/auth/callback",
+  "https://struct-tissue-jamaica-margin.trycloudflare.com/auth/shopify/callback",
+  "https://struct-tissue-jamaica-margin.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

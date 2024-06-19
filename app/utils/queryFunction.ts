@@ -22,8 +22,20 @@ export const queryFunction = ({
         }
         edges {
           node {
-            id
-            title
+          id
+          status
+        totalInventory
+         metafields(first:1 , keys:["custom.recommended_produccts"]) { 
+            edges {
+              node {
+                id
+                namespace
+                key
+                value
+              }
+            }
+          }
+        title
             createdAt
      		    vendor
             featuredImage {

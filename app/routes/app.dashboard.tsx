@@ -18,6 +18,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { apiVersion, authenticate } from "~/shopify.server";
 import { pageInfomation } from "~/config/typeConfig";
+import DataTableComponent from "~/components/DataTableComponent";
 export const query = `
 {
   products(first:10) {
@@ -30,6 +31,8 @@ export const query = `
     edges {
       node {
         id
+        status
+        totalInventory
          metafields(first:1 , keys:["custom.recommended_produccts"]) { 
             edges {
               node {
@@ -103,6 +106,7 @@ const Dashboard = () => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null,
   );
+  const [subProducts, setSubProducts] = useState([]);
 
   useEffect(() => {
     setProducts(edges);
@@ -203,27 +207,53 @@ const Dashboard = () => {
     },
   ];
   const [metaFieldId, setMetaFieldId] = useState<string>("");
-  const handleToggleAccordion = async (productId: string, metafieldId: any) => {
+
+  const handleToggleAccordion = async (
+    productId: string,
+    metafieldId?: any,
+  ) => {
     setSelectedProductId(selectedProductId === productId ? null : productId);
-    setMetaFieldId(metaFieldId === metafieldId ? null : metafieldId);
-    setIsVisible(false);
-    const parts: any = selectedProductId?.split("/");
-    const product_id = parts[parts?.length - 1];
-    console.log(metafieldId, "recevemeif");
-    const parts2: any = metaFieldId?.split("/");
-    const metaId = parts2 && parts2[parts2?.length - 1];
-    console.log(productId, "pid");
-    console.log(metaId, "mid");
-    const response = await fetch(
-      `/api/fetchmetafield?productId=${product_id}&metaFieldId=${metaId}`,
+
+    // Conditionally set the metafield ID if it exists
+    setMetaFieldId(
+      metafieldId ? (metaFieldId === metafieldId ? null : metafieldId) : null,
     );
-    const data = await response.json();
-    console.log(data);
+
+    // Hide the accordion or related UI component
+    setIsVisible(false);
+
+    if (metafieldId) {
+      const metaIdParts: any = metafieldId?.split("/");
+      const metaId = metaIdParts[metaIdParts?.length - 1];
+
+      const productParts: any = productId?.split("/");
+      const product_id = productParts[productParts?.length - 1];
+
+      try {
+        const response = await fetch(
+          `/api/fetchmetafield?productId=${product_id}&metaFieldId=${metaId}`,
+        );
+
+        if (response.ok) {
+          const { data } = await response.json();
+          setSubProducts(data[0]);
+        } else {
+          console.error("Failed to fetch metafield data:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching metafield data:", error);
+      }
+    } else {
+      console.log("No valid metafield ID provided. Skipping fetch operation.");
+    }
   };
 
+  console.log(subProducts, "subproducts");
   const handleSelectionChange = (selected: string[] | any) => {
+    console.log(selected.length, "selected");
     setSelectedProductId(selected.length > 0 ? selected[0] : null);
   };
+
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const handleAddRelatedProduct = async () => {
@@ -279,11 +309,21 @@ const Dashboard = () => {
       vendor,
       createdAt,
     } = product.node;
-    const { edges } = metafields;
-    let metafieldId: any;
-    if (edges.length) {
-      metafieldId = edges[0].node.id;
+
+    let metafieldId: any = null;
+    if (metafields && metafields.edges) {
+      const { edges = [] } = metafields;
+
+      if (Array.isArray(edges) && edges.length > 0) {
+        for (const edge of edges) {
+          if (edge.node && edge.node.id) {
+            metafieldId = edge.node.id;
+            break;
+          }
+        }
+      }
     }
+
     const isExpanded = selectedProductId === id;
     return (
       <>
@@ -291,19 +331,24 @@ const Dashboard = () => {
           key={id}
           id={id}
           selected={isExpanded}
-          onClick={() => handleToggleAccordion(id, metafieldId)}
+          onClick={() =>
+            metafieldId
+              ? handleToggleAccordion(id, metafieldId)
+              : handleToggleAccordion(id)
+          }
           position={index}
         >
-          <IndexTable.Cell className="border">{title}</IndexTable.Cell>
-          <IndexTable.Cell>{createdAt}</IndexTable.Cell>
           <IndexTable.Cell>
             <img
               src={featuredImage?.url}
               alt="Product"
-              height={40}
-              width={60}
+              height={30}
+              width={50}
             />
           </IndexTable.Cell>
+          <IndexTable.Cell className="">{title}</IndexTable.Cell>
+          <IndexTable.Cell>{createdAt}</IndexTable.Cell>
+
           <IndexTable.Cell>
             {priceRange?.minVariantPrice?.amount}
           </IndexTable.Cell>
@@ -336,45 +381,47 @@ const Dashboard = () => {
   const handleChange = (value: string) => {
     setInputValue(value);
   };
+  console.log(pageInformation);
 
   return (
-    <Page>
+    <Page title="Dashboard" fullWidth={true}>
       <Layout>
         <Layout.Section>
-          <h1>Dashboard</h1>
-        </Layout.Section>
-
-        <Layout.Section>
-          <Form noValidate onSubmit={() => handleSubmit(inputValue)}>
-            <FormLayout>
-              <div className="flex items-center gap-2">
-                <TextField
-                  label=""
-                  value={inputValue}
-                  onChange={handleChange}
-                  placeholder="Search products"
-                  type="search"
-                  autoComplete="off"
-                />
-
-                <Button variant="secondary" submit>
-                  Search
-                </Button>
-              </div>
-            </FormLayout>
-          </Form>
-        </Layout.Section>
-
-        <Layout.Section>
           <Card>
-            <h1>All products</h1>
+            <div className="flex items-center justify-between py-1 ">
+              <h1 className="text-lg tracking-wide font-semibold">
+                All products
+              </h1>
+              <Form noValidate onSubmit={() => handleSubmit(inputValue)}>
+                <FormLayout>
+                  <div className="flex items-center gap-2">
+                    <TextField
+                      label=""
+                      value={inputValue}
+                      onChange={handleChange}
+                      placeholder="Search products"
+                      type="search"
+                      autoComplete="off"
+                    />
+
+                    <Button variant="secondary" submit>
+                      Search
+                    </Button>
+                  </div>
+                </FormLayout>
+              </Form>
+            </div>
           </Card>
         </Layout.Section>
 
         <Layout.Section>
-          <Card>
-            <Box paddingBlockEnd="400">
-              <IndexTable
+          <DataTableComponent
+            pageInformation={pageInformation}
+            handleNextPagination={handleNextPagination}
+            handlePrevPagination={handlePrevPagination}
+            products={products}
+          />
+          {/* <IndexTable
                 key={1}
                 itemCount={products?.length}
                 selectedItemsCount={
@@ -406,11 +453,10 @@ const Dashboard = () => {
                     />
                   </div>
                 ) : (
+                
                   rowMarkup
                 )}
-              </IndexTable>
-            </Box>
-          </Card>
+              </IndexTable> */}
         </Layout.Section>
       </Layout>
     </Page>
