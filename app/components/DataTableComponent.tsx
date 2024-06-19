@@ -1,3 +1,4 @@
+import { Pagination } from "@shopify/polaris";
 import { useState } from "react";
 import { pageInfomation } from "~/config/typeConfig";
 
@@ -197,6 +198,13 @@ const DataTableComponent = ({
           </thead>
           <tbody>{row}</tbody>
         </table>
+        <Pagination
+          type="table"
+          onNext={handleNextPagination}
+          onPrevious={handlePrevPagination}
+          hasNext={pageInformation?.hasNextPage}
+          hasPrevious={pageInformation?.hasPreviousPage}
+        />
       </div>
     </div>
   );
