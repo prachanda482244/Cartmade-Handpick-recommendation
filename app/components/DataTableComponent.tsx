@@ -1,7 +1,8 @@
 import { Pagination } from "@shopify/polaris";
 import { useState } from "react";
-import { pageInfomation } from "~/config/typeConfig";
+import { pageInformation } from "~/config/typeConfig";
 import Loader from "./Loader";
+import SubProduct from "./SubProduct";
 
 const DataTableComponent = ({
   pageInformation,
@@ -10,7 +11,7 @@ const DataTableComponent = ({
   products,
   isLoading,
 }: {
-  pageInformation: pageInfomation;
+  pageInformation: pageInformation;
   handlePrevPagination: any;
   handleNextPagination: any;
   products: any[];
@@ -43,14 +44,12 @@ const DataTableComponent = ({
         .join("&");
 
       const parts: any = mainId?.split("/");
-      console.log(parts, "parts");
       const productId = parseInt(parts[parts?.length - 1]);
       console.log(queryString, "query string");
       const response = await fetch(
         `/api/metafield?${queryString}&mainProductId=${productId}`,
       );
 
-      // Handle the server response
       const data = await response.json();
       console.log("Metafield data:", data);
     } catch (error) {
@@ -61,7 +60,7 @@ const DataTableComponent = ({
     }
   };
 
-  const handleEdiRelatedProduct = async () => {
+  const handleEdiRelatedProduct = async (mainId: string) => {
     const arrayId = subProducts.map((product: any) => {
       return {
         id: product.id,
@@ -72,8 +71,9 @@ const DataTableComponent = ({
       // Use Shopify App Bridge to pick products
       const selected = await shopify.resourcePicker({
         type: "product",
-        multiple: 4,
         selectionIds: arrayId,
+        multiple: 4,
+        action: "select",
         filter: {
           variants: false,
           archived: false,
@@ -81,10 +81,11 @@ const DataTableComponent = ({
         },
       });
 
-      console.log(selected);
       // Extract and map the product IDs to an array
-      // const productIds = selected?.map(({ id }) => id);
+      const productIds = selected?.map(({ id }) => id);
 
+      console.log(productIds, "product ids");
+      console.log(mainId, "maindid");
       // // Serialize the product IDs into a query string format
       // const queryString = productIds
       //   ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
@@ -144,6 +145,33 @@ const DataTableComponent = ({
     }
   };
   console.log(subProducts);
+
+  const handleDragStart = (event: any, index: any) => {
+    event.dataTransfer.setData("index", index.toString());
+  };
+
+  const handleDragOver = (event: any) => {
+    event.preventDefault();
+  };
+
+  const handleDrop = (event: any, newIndex: any) => {
+    const draggedIndex = parseInt(event.dataTransfer.getData("index"));
+    if (draggedIndex === newIndex) {
+      return;
+    }
+
+    const draggedItem = subProducts[draggedIndex];
+    const newSubProducts = [...subProducts];
+
+    // Remove the dragged item from its original position
+    newSubProducts.splice(draggedIndex, 1);
+
+    // Insert the dragged item at the new position
+    newSubProducts.splice(newIndex, 0, draggedItem);
+
+    setSubProducts(newSubProducts);
+  };
+
   const rows = products.map((product) => {
     const {
       id,
@@ -218,11 +246,22 @@ const DataTableComponent = ({
                 </p>
               </div>
               <div className="w-1/2">
-                {subProducts?.map((product: any) => (
+                <SubProduct
+                  subProducts={subProducts}
+                  handleDragOver={handleDragOver}
+                  handleDragStart={handleDragStart}
+                  featuredImage={featuredImage}
+                  handleDrop={handleDrop}
+                />
+                {/* {subProducts?.map((product: any, index: number) => (
                   <div
                     className="hover:bg-gray-200 flex flex-col border-b items-center  justify-between cursor-pointer"
                     key={product.id}
-                    onClick={() => handleClick(id, metafieldId)}
+                    draggable={true}
+                    onDragStart={(event) => handleDragStart(event, index)}
+                    onDragOver={handleDragOver}
+                    onDrop={(event) => handleDrop(event, index)}
+                    o
                   >
                     <div className="flex justify-between items-center w-full">
                       <p className="py-2 px-4 flex items-center w-[20%]">
@@ -243,7 +282,7 @@ const DataTableComponent = ({
                       <p className="py-2 px-4 w-[25%]">{product.vendor}</p>
                     </div>
                   </div>
-                ))}
+                ))} */}
               </div>
               <div className="flex w-1/2 gap-5 items-center">
                 {subProducts === undefined ? (
@@ -256,7 +295,7 @@ const DataTableComponent = ({
                 ) : (
                   <>
                     <button
-                      onClick={handleEdiRelatedProduct}
+                      onClick={() => handleEdiRelatedProduct(id)}
                       className="bg-green-400 py-2 px-4 items-start text-white rounded-md tracking-wider"
                     >
                       Edit Product

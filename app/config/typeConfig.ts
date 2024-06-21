@@ -1,4 +1,4 @@
-export interface pageInfomation {
+export interface pageInformation {
   endCursor: string;
   startCursor: string;
   hasPreviousPage: boolean;

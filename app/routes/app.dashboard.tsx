@@ -1,5 +1,4 @@
 import { LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { DeleteIcon } from "@shopify/polaris-icons";
 import { useLoaderData } from "@remix-run/react";
 import {
   Box,
@@ -17,7 +16,7 @@ import {
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { apiVersion, authenticate } from "~/shopify.server";
-import { pageInfomation } from "~/config/typeConfig";
+import { pageInformation } from "~/config/typeConfig";
 import DataTableComponent from "~/components/DataTableComponent";
 export const query = `
 {
@@ -93,7 +92,7 @@ export const loader: LoaderFunction = async ({
 
 const Dashboard = () => {
   const loaderData: any = useLoaderData();
-  const [pageInformation, setPageInformation] = useState<pageInfomation>({
+  const [pageInformation, setPageInformation] = useState<pageInformation>({
     endCursor: "",
     startCursor: "",
     hasNextPage: true,
