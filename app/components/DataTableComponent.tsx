@@ -84,27 +84,20 @@ const DataTableComponent = ({
       // Extract and map the product IDs to an array
       const productIds = selected?.map(({ id }) => id);
 
-      console.log(productIds, "product ids");
-      console.log(mainId, "maindid");
-      // // Serialize the product IDs into a query string format
-      // const queryString = productIds
-      //   ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
-      //   .join("&");
+      // Serialize the product IDs into a query string format
+      const queryString = productIds
+        ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
+        .join("&");
 
-      // // Send the request to the server
-      // // const response = await fetch(
-      // //   `/api/meta?${queryString}&mainProductId=${selectedProductId}`,
-      // // );
-      // const parts: any = selectedProductId?.split("/");
-      // const productId = parseInt(parts[parts.length - 1]);
-      // console.log(productId);
-      // const response = await fetch(
-      //   `/api/metafield?${queryString}&mainProductId=${productId}`,
-      // );
+      const parts: any = mainId?.split("/");
+      const productId = parseInt(parts[parts?.length - 1]);
+      console.log(queryString, "query string");
+      const response = await fetch(
+        `/api/metafield?${queryString}&mainProductId=${productId}`,
+      );
 
-      // // Handle the server response
-      // const data = await response.json();
-      // console.log("Metafield data:", data);
+      const data = await response.json();
+      console.log("Metafield data:", data);
     } catch (error) {
       console.error(
         "Error selecting products or fetching metafield data:",
@@ -199,8 +192,8 @@ const DataTableComponent = ({
           key={id}
           onClick={() => handleClick(id, metafieldId)}
         >
-          <div className="flex justify-between items-center w-full">
-            <p className="py-2 px-4 flex items-center w-[20%]">
+          <div className="flex justify-between text-xs items-center w-full">
+            <p className="py-2 px-4  flex items-center w-[20%]">
               <img
                 src={featuredImage?.url}
                 alt="Product"
@@ -209,7 +202,9 @@ const DataTableComponent = ({
               {title}
             </p>
             <p className="py-2 px-4 w-[10%]">
-              <span className="bg-green-200 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
+              <span
+                className={`bg-green-200 text-green-800 ${status === "ARCHIVED" ? "bg-[#f0f0f0]" : ""} ${status === "DRAFT" ? "bg-[#e6f3ff]" : ""} text-[10px] font-semibold   p-[2px] rounded`}
+              >
                 {status}
               </span>
             </p>
@@ -217,7 +212,7 @@ const DataTableComponent = ({
             <p className="py-2 px-4 w-[10%]">
               {priceRange?.minVariantPrice?.amount}
             </p>
-            <p className="py-2 px-4">{createdAt}</p>
+            <p className="py-2 w-[13%] px-4">{createdAt.split("T")[0]}</p>
             <p className="py-2 px-4 w-[13%]">{vendor}</p>
           </div>
         </div>
@@ -225,23 +220,23 @@ const DataTableComponent = ({
           (isProductLoading ? (
             <Loader />
           ) : (
-            <div className=" flex flex-col gap-2 items-center justify-center py-4 px-6 w-full">
+            <div className=" flex flex-col gap-2 items-center p-5">
               <h1 className="font-semibold text-lg tracking-wide ">
                 Recommended Products
               </h1>
-              <div className="flex justify-between items-center border w-1/2 border-gray-600 py-2">
-                <p className=" font-semibold text-sm w-[20%] px-4 text-left leading-4 text-gray-700 tracking-wider">
+              <div className="flex justify-between items-center border-b w-1/2  py-2">
+                <p className=" font-semibold text-xs w-1/2 px-4 text-left leading-4 text-gray-700 tracking-wider">
                   Product
                 </p>
 
-                <p className=" font-light text-sm px-4 w-[7%] text-left leading-4 text-gray-700 tracking-wider">
+                <p className=" font-semibold text-xs px-4 w-[7%] text-left leading-4 text-gray-700 tracking-wider">
                   Inventory
                 </p>
-                <p className=" font-light text-sm px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
+                <p className=" font-semibold text-xs px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
                   Price
                 </p>
 
-                <p className=" font-light text-sm w-[25%] px-4 text-left leading-4 text-gray-700 tracking-wider">
+                <p className=" font-semibold text-xs w-[25%] px-4 text-left leading-4 text-gray-700 tracking-wider">
                   Vendor
                 </p>
               </div>
@@ -252,37 +247,8 @@ const DataTableComponent = ({
                   handleDragStart={handleDragStart}
                   featuredImage={featuredImage}
                   handleDrop={handleDrop}
+                  setSubProducts={setSubProducts}
                 />
-                {/* {subProducts?.map((product: any, index: number) => (
-                  <div
-                    className="hover:bg-gray-200 flex flex-col border-b items-center  justify-between cursor-pointer"
-                    key={product.id}
-                    draggable={true}
-                    onDragStart={(event) => handleDragStart(event, index)}
-                    onDragOver={handleDragOver}
-                    onDrop={(event) => handleDrop(event, index)}
-                    o
-                  >
-                    <div className="flex justify-between items-center w-full">
-                      <p className="py-2 px-4 flex items-center w-[20%]">
-                        <img
-                          src={featuredImage?.url}
-                          alt="Product"
-                          className="w-10 h-10"
-                        />
-                        {product.title}
-                      </p>
-
-                      <p className="py-2 px-4 w-[7%] text-red-600">
-                        {product.totalInventory}
-                      </p>
-                      <p className="py-2 px-4 w-[10%]">
-                        {product.priceRange?.minVariantPrice?.amount}
-                      </p>
-                      <p className="py-2 px-4 w-[25%]">{product.vendor}</p>
-                    </div>
-                  </div>
-                ))} */}
               </div>
               <div className="flex w-1/2 gap-5 items-center">
                 {subProducts === undefined ? (
@@ -321,24 +287,24 @@ const DataTableComponent = ({
         <Loader />
       ) : (
         <div className="overflow-x-auto">
-          <div className="min-w-full p-2 bg-white">
-            <div className="flex justify-between items-center border border-gray-200 py-2">
-              <p className="py-2 font-semibold text-base w-[20%] px-4 text-left leading-4 text-gray-700 tracking-wider">
+          <div className="min-w-full p-2 text-xs rounded-lg  bg-white">
+            <div className="flex justify-between items-center border-b py-2">
+              <p className="py-2 font-semibold text-xs w-[20%]  text-left leading-4 text-gray-700 tracking-wider">
                 Product
               </p>
-              <p className="py-2 font-semibold text-base px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-semibold text-xs px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
                 Status
               </p>
-              <p className="py-2 font-semibold text-base px-4 w-[7%] text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-semibold text-xs px-4 w-[7%] text-left leading-4 text-gray-700 tracking-wider">
                 Inventory
               </p>
-              <p className="py-2 font-semibold text-base px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-semibold text-xs px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
                 Price
               </p>
-              <p className="py-2 font-semibold text-base px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-semibold text-xs px-4 w-[13%] text-left leading-4 text-gray-700 tracking-wider">
                 Created At
               </p>
-              <p className="py-2 font-semibold text-base w-[13%] px-4 text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-semibold text-xs w-[13%] px-4 text-left leading-4 text-gray-700 tracking-wider">
                 Vendor
               </p>
             </div>
