@@ -23,25 +23,32 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
     const productQueryIds = JSON.parse(metafieldData?.value || "[]");
+
     if (!Array.isArray(productQueryIds) || productQueryIds.length === 0) {
       return json({
-        success: false,
+        success: true,
         data: [],
         message: "No product IDs found in metafield",
       });
     }
 
-    // Construct the GraphQL query
     const productQueries = productQueryIds
       .map(
         (id, index) => `
           product${index}: product(id: "${id}") {
-        id
-        title
-        description
-        onlineStoreUrl
-      }
-    `,
+            id
+            title
+            description
+            totalInventory
+            vendor
+             priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+          }
+        `,
       )
       .join("\n");
 
@@ -57,6 +64,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const productArray = products.map((productArr: any) =>
       Object.values(productArr),
     );
+
     return json({
       success: true,
       data: productArray,

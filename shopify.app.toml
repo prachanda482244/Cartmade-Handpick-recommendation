@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://struct-tissue-jamaica-margin.trycloudflare.com"
+application_url = "https://delight-dressed-charms-pathology.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://struct-tissue-jamaica-margin.trycloudflare.com/auth/callback",
-  "https://struct-tissue-jamaica-margin.trycloudflare.com/auth/shopify/callback",
-  "https://struct-tissue-jamaica-margin.trycloudflare.com/api/auth/callback"
+  "https://delight-dressed-charms-pathology.trycloudflare.com/auth/callback",
+  "https://delight-dressed-charms-pathology.trycloudflare.com/auth/shopify/callback",
+  "https://delight-dressed-charms-pathology.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

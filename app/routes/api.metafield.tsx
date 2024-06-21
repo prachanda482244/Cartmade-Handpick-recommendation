@@ -7,6 +7,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const metafield = new admin.rest.resources.Metafield({ session: session });
   const url = new URL(request.url);
   const mainProductId: any = url.searchParams.get("mainProductId");
+  console.log(mainProductId, "main product  ids");
   const productIds = [];
   for (let i = 0; url.searchParams.has(`productIds[${i}]`); i++) {
     const id = url.searchParams.get(`productIds[${i}]`);
@@ -16,7 +17,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       console.error(`Product at index ${i} is missing id`);
     }
   }
-  console.log(productIds);
+  console.log(productIds, "product ids");
   const mainId = parseInt(mainProductId);
   console.log(typeof mainId);
 
