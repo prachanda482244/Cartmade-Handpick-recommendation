@@ -10,3 +10,42 @@ export interface query {
   pageToken?: string | any;
   searchQuery?: string | any;
 }
+export interface Products {
+  node: {
+    id: string;
+    metafields?: {
+      edges?: Array<{
+        node: {
+          id: string;
+        };
+      }>;
+    };
+    priceRange: {
+      minVariantPrice: {
+        amount: string;
+      };
+    };
+    featuredImage: {
+      url: string;
+    };
+    status: string;
+    title: string;
+    totalInventory: number;
+    vendor: string;
+    createdAt: string;
+  };
+}
+export interface subProducts {
+  id: string;
+  featuredImage?: {
+    url: string;
+  };
+  priceRange: {
+    minVariantPrice: {
+      amount: string;
+    };
+  };
+  title: string;
+  totalInventory: number;
+  vendor: string;
+}

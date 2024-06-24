@@ -16,7 +16,7 @@ import {
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { apiVersion, authenticate } from "~/shopify.server";
-import { pageInformation } from "~/config/typeConfig";
+import { Products, pageInformation } from "~/config/typeConfig";
 import DataTableComponent from "~/components/DataTableComponent";
 export const query = `
 {
@@ -99,10 +99,11 @@ const Dashboard = () => {
     hasPreviousPage: false,
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [products, setProducts] = useState<any>([]);
+  const [products, setProducts] = useState<Products[]>([]);
   const { pageInfo, edges } = loaderData;
   const [inputValue, setInputValue] = useState<string>("");
 
+  console.log(edges);
   useEffect(() => {
     setProducts(edges);
     setPageInformation(pageInfo);

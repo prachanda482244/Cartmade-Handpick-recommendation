@@ -1,8 +1,15 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { MdDragIndicator } from "react-icons/md";
-import { useState } from "react";
+import { Dispatch, useState } from "react";
+import { subProducts } from "~/config/typeConfig";
 
-const SubProduct = ({ subProducts, setSubProducts, featuredImage }: any) => {
+const SubProduct = ({
+  subProducts,
+  setSubProducts,
+}: {
+  subProducts: subProducts[];
+  setSubProducts: any;
+}) => {
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
   const handleDragStart = (event: React.DragEvent, index: number) => {
@@ -12,7 +19,7 @@ const SubProduct = ({ subProducts, setSubProducts, featuredImage }: any) => {
     event.dataTransfer.setData("text/plain", index.toString());
   };
 
-  const handleDragOver = (event: React.DragEvent, index: number) => {
+  const handleDragOver = (event: React.DragEvent | any, index: number) => {
     event.preventDefault();
     if (draggingIndex === null) return;
 
@@ -69,7 +76,11 @@ const SubProduct = ({ subProducts, setSubProducts, featuredImage }: any) => {
 
               <p className="py-2 px-4 flex items-center w-1/2">
                 <img
-                  src={featuredImage?.url}
+                  src={
+                    product.featuredImage === null
+                      ? "https://www.electriciens-sans-frontieres.org/web/app/plugins/wp-media-folder/assets/images/gallery_hover-avada.svg"
+                      : product.featuredImage?.url
+                  }
                   alt="Product"
                   className="w-10 h-10"
                 />

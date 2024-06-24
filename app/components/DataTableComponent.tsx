@@ -1,6 +1,6 @@
 import { Pagination } from "@shopify/polaris";
 import { useState } from "react";
-import { pageInformation } from "~/config/typeConfig";
+import { Products, pageInformation, subProducts } from "~/config/typeConfig";
 import Loader from "./Loader";
 import SubProduct from "./SubProduct";
 
@@ -14,11 +14,11 @@ const DataTableComponent = ({
   pageInformation: pageInformation;
   handlePrevPagination: any;
   handleNextPagination: any;
-  products: any[];
+  products: Products[];
   isLoading: boolean;
 }) => {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [subProducts, setSubProducts] = useState<any>(null);
+  const [subProducts, setSubProducts] = useState<subProducts[]>([]);
   const [isProductLoading, setIsProductLoading] = useState<boolean>(true);
   const [activeId, setActiveId] = useState<string>("");
 
@@ -105,7 +105,7 @@ const DataTableComponent = ({
       );
     }
   };
-  const handleClick = async (productId: string, metafieldId: string) => {
+  const handleClick = async (productId: string, metafieldId: string | null) => {
     setActiveId(productId);
     const isCurrentlyExpanded = expandedRow === productId;
     setExpandedRow(isCurrentlyExpanded ? null : productId);
@@ -178,13 +178,12 @@ const DataTableComponent = ({
       createdAt,
     } = product.node;
 
-    let metafieldId = null;
-    if (metafields?.edges?.length > 0) {
+    let metafieldId: string | null = null;
+    if (Array.isArray(metafields?.edges) && metafields.edges.length > 0) {
       metafieldId = metafields.edges[0]?.node?.id || null;
     }
 
     const isExpanded = expandedRow === id;
-
     return (
       <>
         <div
@@ -195,7 +194,11 @@ const DataTableComponent = ({
           <div className="flex justify-between text-xs items-center w-full">
             <p className="py-2 px-4  flex items-center w-[20%]">
               <img
-                src={featuredImage?.url}
+                src={
+                  featuredImage === null
+                    ? "https://www.electriciens-sans-frontieres.org/web/app/plugins/wp-media-folder/assets/images/gallery_hover-avada.svg"
+                    : featuredImage?.url
+                }
                 alt="Product"
                 className="w-10 h-10"
               />
@@ -243,10 +246,6 @@ const DataTableComponent = ({
               <div className="w-1/2">
                 <SubProduct
                   subProducts={subProducts}
-                  handleDragOver={handleDragOver}
-                  handleDragStart={handleDragStart}
-                  featuredImage={featuredImage}
-                  handleDrop={handleDrop}
                   setSubProducts={setSubProducts}
                 />
               </div>
@@ -254,7 +253,7 @@ const DataTableComponent = ({
                 {subProducts === undefined ? (
                   <button
                     onClick={() => handleAddRelatedProduct(id)}
-                    className="bg-sky-400 py-2 px-4 items-start text-white rounded-md tracking-wider"
+                    className="bg-sky-400 hover:bg-sky-600 py-2 px-4 items-start text-white rounded-md tracking-wider"
                   >
                     Add Product
                   </button>

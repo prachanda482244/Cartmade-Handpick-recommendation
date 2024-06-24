@@ -41,6 +41,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
             description
             totalInventory
             vendor
+             featuredImage {
+              url
+            }
              priceRange {
               minVariantPrice {
                 amount
