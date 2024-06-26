@@ -1,15 +1,29 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { MdDragIndicator } from "react-icons/md";
-import { Dispatch, useState } from "react";
+import { useEffect, useState } from "react";
 import { subProducts } from "~/config/typeConfig";
 
 const SubProduct = ({
   subProducts,
   setSubProducts,
+  mainId,
+  metaFieldId,
+  productId,
+  fetchData,
 }: {
   subProducts: subProducts[];
   setSubProducts: any;
+  mainId: string;
+  metaFieldId: string;
+  productId: string;
+  fetchData: any;
 }) => {
+  console.log(productId, "pid");
+  console.log(metaFieldId, "mid");
+  // useEffect(() => {
+  //   fetchData(metaFieldId, productId);
+  // }, [metaFieldId, productId]);
+
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
   const handleDragStart = (event: React.DragEvent, index: number) => {
@@ -19,7 +33,7 @@ const SubProduct = ({
     event.dataTransfer.setData("text/plain", index.toString());
   };
 
-  const handleDragOver = (event: React.DragEvent | any, index: number) => {
+  const handleDragOver = async (event: React.DragEvent, index: number) => {
     event.preventDefault();
     if (draggingIndex === null) return;
 
@@ -30,6 +44,28 @@ const SubProduct = ({
 
       setSubProducts(updatedSubProducts);
       setDraggingIndex(index);
+      console.log(subProducts, "Subproducts");
+
+      const ids = subProducts.map(({ id }) => id);
+      console.log(ids);
+      // const queryString = ids
+      //   ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
+      //   .join("&");
+
+      // const parts: any = mainId?.split("/");
+      // const productId = parseInt(parts[parts?.length - 1]);
+      // console.log(queryString, "query string");
+      // const response = await fetch(
+      //   `/api/metafield?${queryString}&mainProductId=${productId}`,
+      // );
+
+      // const data = await response.json();
+      // // setSubProducts(data);
+      // console.log("Metafield data:", data.data);
+      // fetchData(
+      //   "gid://shopify/Product/" + data.data.id,
+      //   "gid://shopify/Product/" + data.data.product_id,
+      // );
     }
   };
 

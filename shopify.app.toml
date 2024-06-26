@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://jesse-clicking-metal-alloy.trycloudflare.com"
+application_url = "https://idaho-electrical-hoped-leone.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://jesse-clicking-metal-alloy.trycloudflare.com/auth/callback",
-  "https://jesse-clicking-metal-alloy.trycloudflare.com/auth/shopify/callback",
-  "https://jesse-clicking-metal-alloy.trycloudflare.com/api/auth/callback"
+  "https://idaho-electrical-hoped-leone.trycloudflare.com/auth/callback",
+  "https://idaho-electrical-hoped-leone.trycloudflare.com/auth/shopify/callback",
+  "https://idaho-electrical-hoped-leone.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

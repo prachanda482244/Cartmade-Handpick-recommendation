@@ -1,5 +1,5 @@
 import { Pagination } from "@shopify/polaris";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Products, pageInformation, subProducts } from "~/config/typeConfig";
 import Loader from "./Loader";
 import SubProduct from "./SubProduct";
@@ -37,7 +37,6 @@ const DataTableComponent = ({
 
       // Extract and map the product IDs to an array
       const productIds = selected?.map(({ id }) => id);
-
       // Serialize the product IDs into a query string format
       const queryString = productIds
         ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
@@ -50,8 +49,11 @@ const DataTableComponent = ({
         `/api/metafield?${queryString}&mainProductId=${productId}`,
       );
 
-      const data = await response.json();
-      console.log("Metafield data:", data);
+      const { data } = await response.json();
+      fetchData(
+        "gid://shopify/Product/" + data.id,
+        "gid://shopify/Product/" + data.product_id,
+      );
     } catch (error) {
       console.error(
         "Error selecting products or fetching metafield data:",
@@ -66,7 +68,6 @@ const DataTableComponent = ({
         id: product.id,
       };
     });
-    console.log(arrayId);
     try {
       // Use Shopify App Bridge to pick products
       const selected = await shopify.resourcePicker({
@@ -98,6 +99,10 @@ const DataTableComponent = ({
 
       const data = await response.json();
       console.log("Metafield data:", data);
+      fetchData(
+        "gid://shopify/Product/" + data.data.id,
+        "gid://shopify/Product/" + data.data.product_id,
+      );
     } catch (error) {
       console.error(
         "Error selecting products or fetching metafield data:",
@@ -105,65 +110,78 @@ const DataTableComponent = ({
       );
     }
   };
+
+  const [metafield_Id, setMetafieldId] = useState<string>("");
+  const [product_Id, setProductId] = useState<string>("");
+
+  const fetchData = async (metafieldId: string, productId: string) => {
+    setMetafieldId(metafieldId);
+    setProductId(productId);
+    const metaIdParts = metafieldId.split("/");
+    const metaId = metaIdParts[metaIdParts.length - 1];
+
+    const productParts = productId.split("/");
+    const product_id = productParts[productParts.length - 1];
+    setIsProductLoading(true);
+    try {
+      const response = await fetch(
+        `/api/fetchmetafield?productId=${product_id}&metaFieldId=${metaId}`,
+      );
+
+      if (response.ok) {
+        setIsProductLoading(false);
+        const { data } = await response.json();
+        setSubProducts(data[0]);
+      } else {
+        setIsProductLoading(false);
+
+        console.error("Failed to fetch metafield data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching metafield data:", error);
+      setIsProductLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(metafield_Id, product_Id);
+  }, [metafield_Id, product_Id]);
+
   const handleClick = async (productId: string, metafieldId: string | null) => {
     setActiveId(productId);
     const isCurrentlyExpanded = expandedRow === productId;
     setExpandedRow(isCurrentlyExpanded ? null : productId);
 
     if (!isCurrentlyExpanded && metafieldId) {
-      const metaIdParts = metafieldId.split("/");
-      const metaId = metaIdParts[metaIdParts.length - 1];
-
-      const productParts = productId.split("/");
-      const product_id = productParts[productParts.length - 1];
-      setIsProductLoading(true);
-      try {
-        const response = await fetch(
-          `/api/fetchmetafield?productId=${product_id}&metaFieldId=${metaId}`,
-        );
-
-        if (response.ok) {
-          setIsProductLoading(false);
-          const { data } = await response.json();
-          setSubProducts(data[0]);
-        } else {
-          setIsProductLoading(false);
-
-          console.error("Failed to fetch metafield data:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching metafield data:", error);
-        setIsProductLoading(false);
-      }
+      fetchData(metafieldId, productId);
     }
   };
-  console.log(subProducts);
 
-  const handleDragStart = (event: any, index: any) => {
-    event.dataTransfer.setData("index", index.toString());
-  };
+  // const handleDragStart = (event: any, index: any) => {
+  //   event.dataTransfer.setData("index", index.toString());
+  // };
 
-  const handleDragOver = (event: any) => {
-    event.preventDefault();
-  };
+  // const handleDragOver = (event: any) => {
+  //   event.preventDefault();
+  // };
 
-  const handleDrop = (event: any, newIndex: any) => {
-    const draggedIndex = parseInt(event.dataTransfer.getData("index"));
-    if (draggedIndex === newIndex) {
-      return;
-    }
+  // const handleDrop = (event: any, newIndex: any) => {
+  //   const draggedIndex = parseInt(event.dataTransfer.getData("index"));
+  //   if (draggedIndex === newIndex) {
+  //     return;
+  //   }
 
-    const draggedItem = subProducts[draggedIndex];
-    const newSubProducts = [...subProducts];
+  //   const draggedItem = subProducts[draggedIndex];
+  //   const newSubProducts = [...subProducts];
 
-    // Remove the dragged item from its original position
-    newSubProducts.splice(draggedIndex, 1);
+  //   // Remove the dragged item from its original position
+  //   newSubProducts.splice(draggedIndex, 1);
 
-    // Insert the dragged item at the new position
-    newSubProducts.splice(newIndex, 0, draggedItem);
+  //   // Insert the dragged item at the new position
+  //   newSubProducts.splice(newIndex, 0, draggedItem);
 
-    setSubProducts(newSubProducts);
-  };
+  //   setSubProducts(newSubProducts);
+  // };
 
   const rows = products.map((product) => {
     const {
@@ -247,6 +265,10 @@ const DataTableComponent = ({
                 <SubProduct
                   subProducts={subProducts}
                   setSubProducts={setSubProducts}
+                  metaFieldId={metafield_Id}
+                  productId={product_Id}
+                  fetchData={fetchData}
+                  mainId={id}
                 />
               </div>
               <div className="flex w-1/2 gap-5 items-center">
