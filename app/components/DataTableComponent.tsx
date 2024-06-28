@@ -19,6 +19,7 @@ const DataTableComponent = ({
 }) => {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [subProducts, setSubProducts] = useState<subProducts[]>([]);
+  const [originalProduct, setOriginalProduct] = useState<subProducts[]>([]);
   const [isProductLoading, setIsProductLoading] = useState<boolean>(true);
   const [activeId, setActiveId] = useState<string>("");
 
@@ -43,6 +44,7 @@ const DataTableComponent = ({
         setIsProductLoading(false);
         const { data } = await response.json();
         setSubProducts(data[0]);
+        setOriginalProduct(data[0]);
       } else {
         setIsProductLoading(false);
 
@@ -134,6 +136,7 @@ const DataTableComponent = ({
                   metaFieldId={metafield_Id}
                   productId={product_Id}
                   fetchData={fetchData}
+                  originalProduct={originalProduct}
                   mainId={id}
                   setIsProductLoading={setIsProductLoading}
                 />

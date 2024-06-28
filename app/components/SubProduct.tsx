@@ -8,11 +8,13 @@ const SubProduct = ({
   setSubProducts,
   mainId,
   metaFieldId,
+  originalProduct,
   productId,
   fetchData,
   setIsProductLoading,
 }: {
   subProducts: subProducts[];
+  originalProduct: subProducts[];
   setSubProducts: any;
   mainId: string;
   metaFieldId: string;
@@ -23,7 +25,12 @@ const SubProduct = ({
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [subproductId, setSubProductId] = useState<string[]>([]);
   const allSubProductId = subProducts?.map(({ id }) => id);
-  const [updatedIndexId, setUpdatedIndexId] = useState<string[]>([]);
+  const [condition, setCondition] = useState<boolean>(false);
+
+  const initialIds = originalProduct?.map(({ title }) => title);
+  useEffect(() => {
+    // setInitialsIds()
+  }, []);
 
   const handleDragStart = (event: React.DragEvent, index: number) => {
     // event.preventDefault();
@@ -31,7 +38,6 @@ const SubProduct = ({
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", index.toString());
   };
-
   const handleDragOver = async (event: React.DragEvent, index: number) => {
     event.preventDefault();
     if (draggingIndex === null) return;
@@ -44,10 +50,28 @@ const SubProduct = ({
       setSubProducts(updatedSubProducts);
       setDraggingIndex(index);
 
-      const ids = subProducts.map(({ id }) => id);
-      const updatedIds = updatedSubProducts.map(({ id }) => id);
-      setUpdatedIndexId(updatedIds);
-      console.log(ids);
+      const updatedIds = updatedSubProducts.map(({ title }) => title);
+      console.log(initialIds);
+      console.log(updatedIds);
+
+      // for (let index = 0; index < initialIds.length; index++) {
+      //   // setCondition(updatedIds[index] !== id);
+      //   // console.log(updatedIds[index] !== id);
+      //   if (updatedIds[index] !== initialIds[index]) {
+      //     setCondition(true);
+      //     console.log("setting true, returning");
+      //     break;
+      //   }
+      //   if (index === initialIds.length - 1) {
+      //     setCondition(false);
+      //     console.log("setting false");
+      //   }
+      // }
+
+      const hasOrderChanged = initialIds.some(
+        (id, idx) => updatedIds[idx] !== id,
+      );
+      setCondition(hasOrderChanged);
     }
   };
 
@@ -206,7 +230,7 @@ const SubProduct = ({
         </div>
         {subProducts?.map((product: any, index: number) => (
           <motion.div
-            key={product.id}
+            key={index}
             onClick={() => handleDeleteProduct(product.id)}
             className={`flex cursor-pointer flex-col border-b items-center justify-between 
               ${subproductId.includes(product.id) ? "bg-gray-200" : ""}
@@ -277,7 +301,7 @@ const SubProduct = ({
               >
                 Edit Product
               </button>
-              {updatedIndexId.length !== 0 && (
+              {condition && (
                 <button className="bg-blue-500 py-2 hover:bg-blue-600 px-4 text-white rounded-md tracking-wider">
                   Save changes
                 </button>
