@@ -26,14 +26,11 @@ const SubProduct = ({
   const [subproductId, setSubProductId] = useState<string[]>([]);
   const allSubProductId = subProducts?.map(({ id }) => id);
   const [condition, setCondition] = useState<boolean>(false);
+  const [updatedProductIds, setUpdatedProductIds] = useState<string[]>([]);
 
-  const initialIds = originalProduct?.map(({ title }) => title);
-  useEffect(() => {
-    // setInitialsIds()
-  }, []);
+  const initialIds = originalProduct?.map(({ id }) => id);
 
   const handleDragStart = (event: React.DragEvent, index: number) => {
-    // event.preventDefault();
     setDraggingIndex(index);
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", index.toString());
@@ -50,23 +47,8 @@ const SubProduct = ({
       setSubProducts(updatedSubProducts);
       setDraggingIndex(index);
 
-      const updatedIds = updatedSubProducts.map(({ title }) => title);
-      console.log(initialIds);
-      console.log(updatedIds);
-
-      // for (let index = 0; index < initialIds.length; index++) {
-      //   // setCondition(updatedIds[index] !== id);
-      //   // console.log(updatedIds[index] !== id);
-      //   if (updatedIds[index] !== initialIds[index]) {
-      //     setCondition(true);
-      //     console.log("setting true, returning");
-      //     break;
-      //   }
-      //   if (index === initialIds.length - 1) {
-      //     setCondition(false);
-      //     console.log("setting false");
-      //   }
-      // }
+      const updatedIds = updatedSubProducts.map(({ id }) => id);
+      setUpdatedProductIds(updatedIds);
 
       const hasOrderChanged = initialIds.some(
         (id, idx) => updatedIds[idx] !== id,
@@ -87,9 +69,6 @@ const SubProduct = ({
         return [...prevSubProductId, id];
       }
     });
-    const ids = subProducts.map(({ id }) => id);
-    console.log(ids);
-    console.log(id);
   };
 
   const handleClick = async () => {
@@ -194,9 +173,25 @@ const SubProduct = ({
       );
     }
   };
-  // useEffect(() => {
-  //   fetchData(metaFieldId, productId);
-  // }, [metaFieldId, productId]);
+
+  const handleSaveChanges = async () => {
+    const queryString = updatedProductIds
+      ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
+      .join("&");
+
+    const parts: any = mainId?.split("/");
+    const productId = parseInt(parts[parts?.length - 1]);
+    const response = await fetch(
+      `/api/metafield?${queryString}&mainProductId=${productId}`,
+    );
+
+    const data = await response.json();
+    fetchData(
+      "gid://shopify/Product/" + data.data.id,
+      "gid://shopify/Product/" + data.data.product_id,
+    );
+  };
+
   return (
     <div className=" flex  gap-2 flex-col">
       <AnimatePresence>
@@ -302,7 +297,10 @@ const SubProduct = ({
                 Edit Product
               </button>
               {condition && (
-                <button className="bg-blue-500 py-2 hover:bg-blue-600 px-4 text-white rounded-md tracking-wider">
+                <button
+                  onClick={handleSaveChanges}
+                  className="bg-blue-500 py-2 hover:bg-blue-600 px-4 text-white rounded-md tracking-wider"
+                >
                   Save changes
                 </button>
               )}
