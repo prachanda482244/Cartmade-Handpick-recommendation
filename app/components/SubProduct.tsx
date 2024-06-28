@@ -10,6 +10,7 @@ const SubProduct = ({
   metaFieldId,
   productId,
   fetchData,
+  setIsProductLoading,
 }: {
   subProducts: subProducts[];
   setSubProducts: any;
@@ -17,14 +18,12 @@ const SubProduct = ({
   metaFieldId: string;
   productId: string;
   fetchData: any;
+  setIsProductLoading: any;
 }) => {
-  console.log(productId, "pid");
-  console.log(metaFieldId, "mid");
-  // useEffect(() => {
-  //   fetchData(metaFieldId, productId);
-  // }, [metaFieldId, productId]);
-
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+  const [subproductId, setSubProductId] = useState<string[]>([]);
+  const allSubProductId = subProducts?.map(({ id }) => id);
+  const [updatedIndexId, setUpdatedIndexId] = useState<string[]>([]);
 
   const handleDragStart = (event: React.DragEvent, index: number) => {
     // event.preventDefault();
@@ -44,28 +43,11 @@ const SubProduct = ({
 
       setSubProducts(updatedSubProducts);
       setDraggingIndex(index);
-      console.log(subProducts, "Subproducts");
 
       const ids = subProducts.map(({ id }) => id);
+      const updatedIds = updatedSubProducts.map(({ id }) => id);
+      setUpdatedIndexId(updatedIds);
       console.log(ids);
-      // const queryString = ids
-      //   ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
-      //   .join("&");
-
-      // const parts: any = mainId?.split("/");
-      // const productId = parseInt(parts[parts?.length - 1]);
-      // console.log(queryString, "query string");
-      // const response = await fetch(
-      //   `/api/metafield?${queryString}&mainProductId=${productId}`,
-      // );
-
-      // const data = await response.json();
-      // // setSubProducts(data);
-      // console.log("Metafield data:", data.data);
-      // fetchData(
-      //   "gid://shopify/Product/" + data.data.id,
-      //   "gid://shopify/Product/" + data.data.product_id,
-      // );
     }
   };
 
@@ -73,15 +55,162 @@ const SubProduct = ({
     setDraggingIndex(null);
   };
 
+  const handleDeleteProduct = (id: string) => {
+    setSubProductId((prevSubProductId) => {
+      if (prevSubProductId.includes(id)) {
+        return prevSubProductId.filter((productId) => productId !== id);
+      } else {
+        return [...prevSubProductId, id];
+      }
+    });
+    const ids = subProducts.map(({ id }) => id);
+    console.log(ids);
+    console.log(id);
+  };
+
+  const handleClick = async () => {
+    const deletedIds = allSubProductId.filter(
+      (item) => !subproductId.includes(item),
+    );
+    // Serialize the product IDs into a query string format
+    const queryString = deletedIds
+      ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
+      .join("&");
+
+    const parts: any = mainId?.split("/");
+    const productId = parseInt(parts[parts?.length - 1]);
+    const response = await fetch(
+      `/api/metafield?${queryString}&mainProductId=${productId}`,
+    );
+
+    const data = await response.json();
+    fetchData(
+      "gid://shopify/Product/" + data.data.id,
+      "gid://shopify/Product/" + data.data.product_id,
+    );
+  };
+
+  const handleAddRelatedProduct = async () => {
+    try {
+      const selected = await shopify.resourcePicker({
+        type: "product",
+        multiple: 4,
+        filter: {
+          variants: false,
+          archived: false,
+          draft: false,
+        },
+      });
+
+      const productIds = selected?.map(({ id }) => id);
+      const queryString = productIds
+        ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
+        .join("&");
+
+      const parts: any = mainId?.split("/");
+      const productId = parseInt(parts[parts?.length - 1]);
+      const response = await fetch(
+        `/api/metafield?${queryString}&mainProductId=${productId}`,
+      );
+
+      const { data } = await response.json();
+      fetchData(
+        "gid://shopify/Product/" + data.id,
+        "gid://shopify/Product/" + data.product_id,
+      );
+    } catch (error) {
+      console.error(
+        "Error selecting products or fetching metafield data:",
+        error,
+      );
+    }
+  };
+
+  const handleEdiRelatedProduct = async () => {
+    const arrayId = subProducts.map((product: any) => {
+      return {
+        id: product.id,
+      };
+    });
+    try {
+      const selected = await shopify.resourcePicker({
+        type: "product",
+        selectionIds: arrayId,
+        multiple: 4,
+        action: "select",
+        filter: {
+          variants: false,
+          archived: false,
+          draft: false,
+        },
+      });
+
+      // Take the id from the selected array
+      const productIds = selected?.map(({ id }) => id);
+
+      const queryString = productIds
+        ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
+        .join("&");
+
+      const parts: any = mainId?.split("/");
+      const productId = parseInt(parts[parts?.length - 1]);
+      const response = await fetch(
+        `/api/metafield?${queryString}&mainProductId=${productId}`,
+      );
+
+      const data = await response.json();
+      fetchData(
+        "gid://shopify/Product/" + data.data.id,
+        "gid://shopify/Product/" + data.data.product_id,
+      );
+    } catch (error) {
+      console.error(
+        "Error selecting products or fetching metafield data:",
+        error,
+      );
+    }
+  };
+  // useEffect(() => {
+  //   fetchData(metaFieldId, productId);
+  // }, [metaFieldId, productId]);
   return (
-    <div>
+    <div className=" flex  gap-2 flex-col">
       <AnimatePresence>
+        <div className=" flex flex-col gap-2 items-center py-5">
+          <h1 className="font-semibold text-lg tracking-wide ">
+            Recommended Products
+          </h1>
+          <div className="flex justify-between items-center border-b w-full  py-2">
+            <p className=" font-semibold text-xs w-full  px-4 text-left leading-4 text-gray-700 tracking-wider">
+              Product
+            </p>
+
+            <p className=" font-semibold text-xs px-4 w-[17%] text-left leading-4 text-gray-700 tracking-wider">
+              Inventory
+            </p>
+            <p className=" font-semibold text-xs px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
+              Price
+            </p>
+
+            <p className=" font-semibold text-xs  w-[15%] px-4 text-left leading-4 text-gray-700 tracking-wider">
+              Vendor
+            </p>
+            <button
+              disabled={subproductId.length === 0}
+              onClick={handleClick}
+              className="bg-red-500 rounded-md disabled:bg-red-300 hover:bg-red-700 py-2 px-6 text-white "
+            >
+              Delete
+            </button>
+          </div>
+        </div>
         {subProducts?.map((product: any, index: number) => (
           <motion.div
             key={product.id}
-            className={`flex flex-col border-b items-center justify-between ${
-              draggingIndex === index ? "bg-gray-200" : ""
-            }`}
+            onClick={() => handleDeleteProduct(product.id)}
+            className={`flex cursor-pointer flex-col border-b items-center justify-between 
+              ${subproductId.includes(product.id) ? "bg-gray-200" : ""}
+              ${draggingIndex === index ? "bg-gray-200 " : ""}`}
             initial={{ y: 0 }}
             animate={{
               y: 0,
@@ -132,6 +261,30 @@ const SubProduct = ({
             </div>
           </motion.div>
         ))}
+        <div className="flex gap-2 items-center">
+          {subProducts === undefined ? (
+            <button
+              onClick={handleAddRelatedProduct}
+              className="bg-sky-400 hover:bg-sky-600 py-2 px-4 items-start text-white rounded-md tracking-wider"
+            >
+              Add Product
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleEdiRelatedProduct}
+                className="bg-green-400 hover:bg-green-600 py-2 px-4 items-start text-white rounded-md tracking-wider"
+              >
+                Edit Product
+              </button>
+              {updatedIndexId.length !== 0 && (
+                <button className="bg-blue-500 py-2 hover:bg-blue-600 px-4 text-white rounded-md tracking-wider">
+                  Save changes
+                </button>
+              )}
+            </>
+          )}
+        </div>
       </AnimatePresence>
     </div>
   );
