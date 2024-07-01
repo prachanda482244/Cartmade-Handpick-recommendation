@@ -8,8 +8,9 @@
   }
 
   .grid-view {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     gap: 20px;
     margin: 20px;
     width: 100%;
@@ -17,13 +18,15 @@
   }
 
   .grid-item {
+    flex: 1 1 100%; /* Default to full width */
     background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensures price and button stay at the bottom */
   }
 
   .grid-item:hover {
@@ -34,12 +37,15 @@
   .grid-item .contain {
     position: relative;
     overflow: hidden;
+    flex: 1;
   }
 
   .grid-item img {
     width: 100%;
     height: 100%;
+    max-height: 220px;
     object-fit: cover;
+    object-position: top;
     transition: transform 0.3s ease;
   }
 
@@ -57,16 +63,51 @@
     font-size: 1.2em;
     color: #ff6600;
     font-weight: bold;
-    margin-top: 5px;
+    margin-top: auto; /* Pushes to the bottom */
   }
 
   .vendor {
-    font-size: 14px;
+    font-size: 12px;
+    text-transform: capitalize;
     font-weight: 400;
+    margin-top: 5px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn:hover {
+    background-color: #333;
+  }
+
+  /* Responsive layout based on items per row */
+  @media (min-width: 600px) {
+    .grid-item {
+      flex-basis: calc(50% - 20px); /* Two items per row */
+    }
+  }
+
+  @media (min-width: 900px) {
+    .grid-item {
+      flex-basis: calc(33.33% - 20px); /* Three items per row */
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .grid-item {
+      flex-basis: calc(25% - 20px); /* Four items per row */
+    }
   }
 </style>
+
 <div class="container">
-  <h1>Products You May Like!</h1>
+  <h1>Recommended Products!</h1>
 
   <div class="grid-view">
     {% assign recommended_products = product.metafields.custom.recommended_produccts.value %}
@@ -74,22 +115,22 @@
       {% if product %}
         <div class="grid-item">
           <div class="contain">
-            <img src="{{ product.featured_image | img_url }}" alt="{{ product.title }}" width="80" height="auto">
+            <img src="{{ product.featured_image | img_url }}" alt="{{ product.title }}">
           </div>
           <h3>{{ product.title }}</h3>
           <p class="price">{{ product.price | money }}</p>
           
-          {% if section.settings.show_vendor %}
-            <p class="vendor">{{ product.vendor }}</p>
+          <div class="item-wrapper">
+          {% if block.settings.show_vendor %}
+            <p class="vendor"> {{ product.vendor }}</p>
           {% endif %}
-          
-          {% if section.settings.show_add_to_cart %}
-            <button>Add to Cart</button>
+
+          {% if block.settings.show_add_to_cart %}
+            <button class="btn">Add to Cart</button>
           {% endif %}
-          
-          {% comment %} {% if section.settings.show_variant_options %} {% endcomment %}
-            <!-- Render variant options here -->
-          {% endif %}
+
+          </div>
+
         </div>
       {% else %}
         <div class="grid-item">
@@ -100,57 +141,51 @@
   </div>
 </div>
 
-
 {% schema %}
-  {
-    "name": "Product Grid Section",
-    "target": "section",
-    "settings": [
-      {
-        "type": "checkbox",
-        "id": "show_add_to_cart",
-        "label": "Show Add to Cart Button",
-        "default": true
-      },
-      {
-        "type": "checkbox",
-        "id": "show_variant_options",
-        "label": "Show Variant Options",
-        "default": true
-      },
-      {
-        "type": "checkbox",
-        "id": "show_vendor",
-        "label": "Show Vendor",
-        "default": true
-      },
-      {
-        "type": "radio",
-        "id": "grid_type",
-        "label": "Grid Layout",
-        "options": [
-          { "value": "slider", "label": "Slider" },
-          { "value": "static", "label": "Static Grid" }
-        ],
-        "default": "slider"
-      },
-      {
-        "type": "number",
-        "id": "items_per_row",
-        "label": "Items Per Row",
-        "min": 1,
-        "max": 5,
-        "default": 3
-      },
-      {
-        "type": "number",
-        "id": "number_of_rows",
-        "label": "Number of Rows",
-        "min": 1,
-        "max": 5,
-        "default": 2
-      }
-    ]
-  }
-  {% endschema %}
-  
+{
+  "name": "Product Grid Section",
+  "target": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_add_to_cart",
+      "label": "Show Add to Cart Button",
+      "default": true
+    },
+    {
+      "type": "radio",
+      "id": "grid_type",
+      "label": "Grid Layout",
+      "options": [
+        { "value": "slider", "label": "Slider" },
+        { "value": "static", "label": "Static Grid" }
+      ],
+      "default": "slider"
+    },
+    {
+      "type": "range",
+      "id": "items_per_row",
+      "label": "Items Per Row",
+      "step": 1,
+      "min": 1,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "number_of_rows",
+      "label": "Number of Rows",
+      "step": 1,
+      "min": 1,
+      "max": 4,
+      "default": 2
+    }
+  ]
+}
+{% endschema %}
