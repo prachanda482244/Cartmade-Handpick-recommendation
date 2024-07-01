@@ -1,17 +1,13 @@
 import { LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import {
-  Box,
   Button,
   Card,
   Form,
   FormLayout,
-  IndexTable,
   Layout,
   Page,
-  Spinner,
   TextField,
-  useIndexResourceState,
 } from "@shopify/polaris";
 import axios from "axios";
 import { useState, useEffect } from "react";

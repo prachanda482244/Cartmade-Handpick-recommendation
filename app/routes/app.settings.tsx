@@ -5,13 +5,13 @@ export const loader: LoaderFunction = ({ request }: LoaderFunctionArgs) => {
   return 1;
 };
 
-const Products = () => {
+const Settings = () => {
   return (
     <Page>
       <Layout>
         <Layout.Section>
           <Card>
-            <h1>All products</h1>
+            <h1>Settings</h1>
           </Card>
         </Layout.Section>
       </Layout>
@@ -19,4 +19,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default Settings;
