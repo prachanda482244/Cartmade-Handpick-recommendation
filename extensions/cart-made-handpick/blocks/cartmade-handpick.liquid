@@ -1,0 +1,156 @@
+<style>
+  /* Styles for container and grid */
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 20px;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .grid-item {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .grid-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .grid-item .contain {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .grid-item:hover img {
+    transform: scale(1.05);
+  }
+
+  .grid-item h3 {
+    font-size: 1.1em;
+    margin: 10px 0;
+    color: #333;
+  }
+
+  .grid-item .price {
+    font-size: 1.2em;
+    color: #ff6600;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+
+  .vendor {
+    font-size: 14px;
+    font-weight: 400;
+  }
+</style>
+<div class="container">
+  <h1>Products You May Like!</h1>
+
+  <div class="grid-view">
+    {% assign recommended_products = product.metafields.custom.recommended_produccts.value %}
+    {% for product in recommended_products %}
+      {% if product %}
+        <div class="grid-item">
+          <div class="contain">
+            <img src="{{ product.featured_image | img_url }}" alt="{{ product.title }}" width="80" height="auto">
+          </div>
+          <h3>{{ product.title }}</h3>
+          <p class="price">{{ product.price | money }}</p>
+          
+          {% if section.settings.show_vendor %}
+            <p class="vendor">{{ product.vendor }}</p>
+          {% endif %}
+          
+          {% if section.settings.show_add_to_cart %}
+            <button>Add to Cart</button>
+          {% endif %}
+          
+          {% comment %} {% if section.settings.show_variant_options %} {% endcomment %}
+            <!-- Render variant options here -->
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="grid-item">
+          <p>Product data not available</p>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+
+{% schema %}
+  {
+    "name": "Product Grid Section",
+    "target": "section",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_add_to_cart",
+        "label": "Show Add to Cart Button",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_variant_options",
+        "label": "Show Variant Options",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_vendor",
+        "label": "Show Vendor",
+        "default": true
+      },
+      {
+        "type": "radio",
+        "id": "grid_type",
+        "label": "Grid Layout",
+        "options": [
+          { "value": "slider", "label": "Slider" },
+          { "value": "static", "label": "Static Grid" }
+        ],
+        "default": "slider"
+      },
+      {
+        "type": "number",
+        "id": "items_per_row",
+        "label": "Items Per Row",
+        "min": 1,
+        "max": 5,
+        "default": 3
+      },
+      {
+        "type": "number",
+        "id": "number_of_rows",
+        "label": "Number of Rows",
+        "min": 1,
+        "max": 5,
+        "default": 2
+      }
+    ]
+  }
+  {% endschema %}
+  
