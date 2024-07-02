@@ -137,11 +137,12 @@ const SubProduct = ({
         type: "product",
         selectionIds: arrayId,
         multiple: 4,
-        action: "select",
+        action: "add",
         filter: {
           variants: false,
           archived: false,
           draft: false,
+          hidden: false,
         },
       });
 
@@ -173,6 +174,12 @@ const SubProduct = ({
     }
   };
 
+  if (handleEdiRelatedProduct) {
+    console.log(handleEdiRelatedProduct);
+  } else {
+    console.log("Picker was cancelled by the user");
+  }
+
   const handleSaveChanges = async () => {
     const queryString = updatedProductIds
       ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
@@ -190,7 +197,6 @@ const SubProduct = ({
       "gid://shopify/Product/" + data.data.product_id,
     );
   };
-
   return (
     <div className=" flex border rounded-lg flex-col">
       <AnimatePresence>
@@ -200,11 +206,6 @@ const SubProduct = ({
               Recommended Products
             </h1>
             <div className="flex items-center gap-2 ">
-              <div className=" py-2 px-4 font-semibold text-black">
-                {subproductId.length !== 0
-                  ? subproductId.length + " selected"
-                  : null}
-              </div>
               <button
                 disabled={subproductId.length === 0}
                 onClick={handleClick}
@@ -216,7 +217,25 @@ const SubProduct = ({
           </div>
           <div className="flex justify-between  items-center border-b w-full px-2 py-4">
             <p className=" font-semibold text-sm  w-[40%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
-              Product title
+              {subproductId.length !== 0 ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked
+                    className="h-4 w-4 cursor-pointer"
+                    onChange={() => {
+                      setSubProductId(
+                        subproductId.length !== initialIds.length
+                          ? initialIds
+                          : [],
+                      );
+                    }}
+                  />
+                  {subproductId.length + " selected"}
+                </div>
+              ) : (
+                "Product title"
+              )}
             </p>
 
             <p className=" font-semibold text-sm px-4 text-left leading-4 text-gray-700 tracking-wider">

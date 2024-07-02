@@ -23,6 +23,7 @@ export default function App() {
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
         <Link to="/app/dashboard">Dashboard</Link>
+        <Link to="/app/test/appbridge">App bridge</Link>
       </NavMenu>
       <Outlet />
     </AppProvider>

@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://eating-consumption-cheapest-massage.trycloudflare.com"
+application_url = "https://thorough-plugins-amendments-sheffield.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://eating-consumption-cheapest-massage.trycloudflare.com/auth/callback",
-  "https://eating-consumption-cheapest-massage.trycloudflare.com/auth/shopify/callback",
-  "https://eating-consumption-cheapest-massage.trycloudflare.com/api/auth/callback"
+  "https://thorough-plugins-amendments-sheffield.trycloudflare.com/auth/callback",
+  "https://thorough-plugins-amendments-sheffield.trycloudflare.com/auth/shopify/callback",
+  "https://thorough-plugins-amendments-sheffield.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
