@@ -155,34 +155,28 @@ const Dashboard = () => {
     <Page title="Dashboard" fullWidth={true}>
       <Layout>
         <Layout.Section>
-          <Card>
-            <div className="flex items-center justify-between py-1 ">
-              <h1 className="text-lg tracking-wide font-semibold">
-                All products
-              </h1>
-              <Form noValidate onSubmit={() => handleSubmit(inputValue)}>
-                <FormLayout>
-                  <div className="flex items-center gap-2">
-                    <TextField
-                      label=""
-                      value={inputValue}
-                      onChange={handleChange}
-                      placeholder="Search products"
-                      type="search"
-                      autoComplete="off"
-                    />
+          <div className=" flex bg-white border rounded-tl-lg rounded-tr-lg py-3 px-4 justify-between items-center">
+            <p className="text-base text-[#5d5d5d]">All products</p>
+            <Form noValidate onSubmit={() => handleSubmit(inputValue)}>
+              <FormLayout>
+                <div className="flex items-center gap-2">
+                  <TextField
+                    label=""
+                    value={inputValue}
+                    onChange={handleChange}
+                    placeholder="Search products"
+                    type="search"
+                    autoComplete="off"
+                  />
 
-                    <Button variant="secondary" submit>
-                      Search
-                    </Button>
-                  </div>
-                </FormLayout>
-              </Form>
-            </div>
-          </Card>
-        </Layout.Section>
+                  <Button variant="secondary" submit>
+                    Search
+                  </Button>
+                </div>
+              </FormLayout>
+            </Form>
+          </div>
 
-        <Layout.Section>
           <DataTableComponent
             pageInformation={pageInformation}
             handleNextPagination={handleNextPagination}

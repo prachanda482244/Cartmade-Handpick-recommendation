@@ -1,5 +1,4 @@
 <style>
-  /* Styles for container and grid */
   .container {
     display: flex;
     flex-direction: column;
@@ -7,10 +6,9 @@
     padding: 20px;
   }
 
-  .grid-view {
+  .product-view {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     gap: 20px;
     margin: 20px;
     width: 100%;
@@ -18,7 +16,6 @@
   }
 
   .grid-item {
-    flex: 1 1 100%; /* Default to full width */
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
@@ -27,6 +24,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    flex: 1 1 100%; 
   }
 
   .grid-item:hover {
@@ -62,7 +60,7 @@
     font-size: 1.2em;
     color: #ff6600;
     font-weight: bold;
-    margin-top: auto; /* Pushes to the bottom */
+    margin-top: auto;
   }
 
   .vendor {
@@ -74,7 +72,7 @@
 
   .btn {
     padding: 6px 10px;
-    border-radius: 10px;
+    border-radius: 5px;
     background-color: black;
     color: white;
     cursor: pointer;
@@ -85,49 +83,64 @@
     background-color: #333;
   }
 
-  /* Responsive layout based on items per row */
-  @media (min-width: 600px) {
-    .grid-item {
-      flex-basis: calc(50% - 20px); /* Two items per row */
-    }
+  .slider-view {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    flex-direction: row;
   }
 
-  @media (min-width: 900px) {
-    .grid-item {
-      flex-basis: calc(33.33% - 20px); /* Three items per row */
-    }
+  .slider-item {
+    /* min-width: 100%; */
+    transition: transform 0.3s ease-in-out;
   }
 
-  @media (min-width: 1200px) {
-    .grid-item {
-      flex-basis: calc(25% - 20px); /* Four items per row */
-    }
+  .slider-controls {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .slider-control {
+    pointer-events: all;
+    background: black;
+    color: white;
+    padding:4px 10px;
+    cursor: pointer;
+  }
+
+  .hidden {
+    display: none;
   }
 </style>
 
 <div class="container">
-  <h1>Recommended Products!</h1>
+  <h1>{{ block.settings.product_title }}</h1>
 
-  <div class="grid-view">
+  <div id="product-view" class="{% if block.settings.grid_type == 'slider' %}slider-view{% else %}product-view{% endif %}">
     {% assign recommended_products = product.metafields.custom.recommended_produccts.value %}
     {% assign items_per_row = block.settings.items_per_row %}
-    
+
     {% for product in recommended_products %}
       {% if product %}
-        <div class="grid-item">
+        <div class="grid-item slider-item">
           <div class="contain">
             <img src="{{ product.featured_image | img_url }}" alt="{{ product.title }}">
           </div>
           <h3>{{ product.title }}</h3>
           <p class="price">{{ product.price | money }}</p>
-          
+
           <div class="item-wrapper">
             {% if block.settings.show_vendor %}
-              <p class="vendor"> {{ product.vendor }}</p>
+              <p class="vendor">{{ product.vendor }}</p>
             {% endif %}
 
             {% if block.settings.show_add_to_cart %}
-              <button class="btn">Add to Cart</button>
+              <button class="btn">{{ block.settings.button_title }} </button>
             {% endif %}
           </div>
         </div>
@@ -136,24 +149,113 @@
           <p>Product data not available</p>
         </div>
       {% endif %}
-      
-      {% comment %}
-        After displaying items_per_row items in the first row,
-        start a new row for the remaining items.
-      {% endcomment %}
-      {% assign items_displayed = forloop.index %}
-      {% if items_displayed == items_per_row %}
-        </div><div class="grid-view">
-      {% endif %}
     {% endfor %}
   </div>
+
+  <!-- Slider Controls -->
+  <div class="slider-controls">
+    <div class="slider-control" id="prev">&lt;</div>
+    <div class="slider-control" id="next">&gt;</div>
+  </div>
 </div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productView = document.getElementById('product-view');
+    const gridItems = document.querySelectorAll('.grid-item');
+
+    let currentIndex = 0;
+
+    function initializeView() {
+      const viewType = '{{ block.settings.grid_type }}';
+      const itemsPerRow = parseInt('{{ block.settings.items_per_row }}', 10);
+      if (viewType === 'slider') {
+        showSliderView();
+      } else {
+        showGridView(itemsPerRow);
+      }
+    }
+
+    function showGridView(itemsPerRow) {
+      productView.classList.remove('slider-view');
+      productView.classList.add('product-view');
+      productView.style.flexDirection = 'row';
+      productView.style.flexWrap = 'wrap';
+      gridItems.forEach((item, index) => {
+        item.classList.remove('hidden');
+        item.style.flexBasis = `calc(${100 / itemsPerRow}% - 20px)`;
+        item.style.display = 'block';
+      });
+      updateSliderControls();
+    }
+
+    function showSliderView() {
+      productView.classList.remove('product-view');
+      productView.classList.add('slider-view');
+      gridItems.forEach((item, index) => {
+        if (index === currentIndex) {
+          item.classList.remove('hidden');
+        } else {
+          item.classList.add('hidden');
+        }
+        item.style.flexBasis = '100%';
+      });
+      updateSliderControls();
+    }
+
+    function updateSliderControls() {
+      const prevButton = document.getElementById('prev');
+      const nextButton = document.getElementById('next');
+
+      if (productView.classList.contains('slider-view')) {
+        prevButton.style.display = 'block';
+        nextButton.style.display = 'block';
+      } else {
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+      }
+    }
+
+    function showNextItem() {
+      gridItems[currentIndex].classList.add('hidden');
+      currentIndex = (currentIndex + 1) % gridItems.length;
+      gridItems[currentIndex].classList.remove('hidden');
+    }
+
+    function showPreviousItem() {
+      gridItems[currentIndex].classList.add('hidden');
+      currentIndex = (currentIndex - 1 + gridItems.length) % gridItems.length;
+      gridItems[currentIndex].classList.remove('hidden');
+    }
+
+    document.getElementById('next').addEventListener('click', showNextItem);
+    document.getElementById('prev').addEventListener('click', showPreviousItem);
+
+    initializeView();
+  });
+</script>
+
+
+
 
 {% schema %}
 {
   "name": "Product Grid Section",
   "target": "section",
   "settings": [
+    {
+    "type": "text",
+    "id": "product_title",
+    "label": "Product Title",
+    "default": "Recommended Product"
+    },
+    {
+    "type": "text",
+    "id": "button_title",
+    "label": "Button Title",
+    "default": "Add to cart"
+    },
     {
       "type": "checkbox",
       "id": "show_vendor",

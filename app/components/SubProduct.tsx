@@ -104,6 +104,7 @@ const SubProduct = ({
           draft: false,
         },
       });
+      if (selected === undefined) return;
 
       const productIds = selected?.map(({ id }) => id);
       const queryString = productIds
@@ -149,6 +150,8 @@ const SubProduct = ({
       });
 
       // Take the id from the selected array
+
+      if (selected === undefined) return;
       const productIds = selected?.map(({ id }) => id);
 
       const queryString = productIds
@@ -193,34 +196,42 @@ const SubProduct = ({
   };
 
   return (
-    <div className=" flex  gap-2 flex-col">
+    <div className=" flex border  rounded-sm gap-[2px] flex-col">
       <AnimatePresence>
-        <div className=" flex flex-col gap-2 items-center py-5">
-          <h1 className="font-semibold text-lg tracking-wide ">
-            Recommended Products
-          </h1>
-          <div className="flex justify-between items-center border-b w-full  py-2">
-            <p className=" font-semibold text-xs w-full  px-4 text-left leading-4 text-gray-700 tracking-wider">
-              Product
+        <div className=" flex flex-col gap-[1px] items-center">
+          <div className="flex justify-between items-center border-b p-1  w-full">
+            <h1 className="font-semibold px-2 text-lg tracking-tight  ">
+              Recommended Products
+            </h1>
+            <div className="flex items-center gap-2 ">
+              <div className=" py-2 px-4 font-semibold text-black">
+                {subproductId.length !== 0
+                  ? subproductId.length + " selected"
+                  : null}
+              </div>
+              <button
+                disabled={subproductId.length === 0}
+                onClick={handleClick}
+                className="bg-red-500 rounded-md disabled:bg-red-300 hover:bg-red-700 py-2 px-6  text-white "
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <div className="flex justify-between  items-center border-b w-full px-2 py-4">
+            <p className=" font-semibold text-sm  w-[50%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
+              Product title
             </p>
 
-            <p className=" font-semibold text-xs px-4 w-[17%] text-left leading-4 text-gray-700 tracking-wider">
+            <p className=" font-semibold text-sm px-4 text-left leading-4 text-gray-700 tracking-wider">
               Inventory
             </p>
-            <p className=" font-semibold text-xs px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
+            <p className=" font-semibold text-sm w-[15%]  px-4text-left leading-4 text-gray-700 tracking-wider">
               Price
             </p>
-
-            <p className=" font-semibold text-xs  w-[15%] px-4 text-left leading-4 text-gray-700 tracking-wider">
+            <p className=" font-semibold text-sm w-[20%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
               Vendor
             </p>
-            <button
-              disabled={subproductId.length === 0}
-              onClick={handleClick}
-              className="bg-red-500 rounded-md disabled:bg-red-300 hover:bg-red-700 py-2 px-6 text-white "
-            >
-              Delete
-            </button>
           </div>
         </div>
         {subProducts?.map((product: any, index: number) => (
@@ -258,7 +269,7 @@ const SubProduct = ({
                 <MdDragIndicator className="w-5 h-5" />
               </motion.div>
 
-              <p className="py-2 px-4 flex items-center w-1/2">
+              <p className="py-2 px-4  flex items-center w-[40%]">
                 <img
                   src={
                     product.featuredImage === null
@@ -270,17 +281,17 @@ const SubProduct = ({
                 />
                 {product.title}
               </p>
-              <p className="py-2 px-4 w-[7%] text-red-600">
+              <p className="py-2 px-4  text-red-600">
                 {product.totalInventory}
               </p>
-              <p className="py-2 px-4 w-[10%]">
+              <p className="py-2 px-4 w-[14%] ">
                 {product.priceRange?.minVariantPrice?.amount}
               </p>
-              <p className="py-2 px-4 w-[25%]">{product.vendor}</p>
+              <p className="py-2 px-4 w-[20%]">{product.vendor}</p>
             </div>
           </motion.div>
         ))}
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 py-2 px-2 items-center">
           {subProducts === undefined ? (
             <button
               onClick={handleAddRelatedProduct}

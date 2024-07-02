@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Products, pageInformation, subProducts } from "~/config/typeConfig";
 import Loader from "./Loader";
 import SubProduct from "./SubProduct";
+import { DefaultGallery } from "~/config/svgItem";
 
 const DataTableComponent = ({
   pageInformation,
@@ -92,36 +93,43 @@ const DataTableComponent = ({
     return (
       <>
         <div
-          className={`hover:bg-gray-200 ${activeId === id ? "bg-gray-300" : ""} flex flex-col border-b items-center  justify-between cursor-pointer`}
+          className={`hover:bg-gray-50 ${activeId === id ? "bg-gray-100" : ""} flex flex-col border-b items-center  justify-between cursor-pointer text-[#3b3b3b]`}
           key={index}
           onClick={() => handleClick(id, metafieldId)}
         >
-          <div className="flex justify-between text-xs items-center w-full">
-            <p className="py-2 px-4  flex items-center w-[20%]">
-              <img
-                src={
-                  featuredImage === null
-                    ? "https://www.electriciens-sans-frontieres.org/web/app/plugins/wp-media-folder/assets/images/gallery_hover-avada.svg"
-                    : featuredImage?.url
-                }
-                alt="Product"
-                className="w-10 h-10"
-              />
-              {title}
+          <div className="flex text-[#5d5d5d]  justify-between text-[13px] items-center w-full">
+            <p className="py-2 px-4 font-medium  flex items-center gap-4 w-[20%]">
+              <span className="border w-10 h-10 rounded-lg ">
+                {featuredImage === null ? (
+                  <DefaultGallery />
+                ) : (
+                  <img
+                    src={featuredImage?.url}
+                    alt="Product"
+                    className="p-1 rounded-lg"
+                  />
+                )}
+              </span>
+
+              <span className="">{title}</span>
             </p>
-            <p className="py-2 px-4 w-[10%]">
+            <p className="py-2 font-medium  px-4 w-[10%]">
               <span
-                className={`bg-green-200 text-green-800 ${status === "ARCHIVED" ? "bg-[#f0f0f0]" : ""} ${status === "DRAFT" ? "bg-[#e6f3ff]" : ""} text-[10px] font-semibold   p-[2px] rounded`}
+                className={`bg-[#b4fed2] text-[#377b59] ${status === "ARCHIVED" ? "bg-[#f0f0f0]" : ""} ${status === "DRAFT" ? "bg-[#e6f3ff]" : ""} text-[10px] font-medium  p-[5px] rounded`}
               >
                 {status}
               </span>
             </p>
-            <p className="py-2 px-4 w-[7%] text-red-600">{totalInventory}</p>
-            <p className="py-2 px-4 w-[10%]">
+            <p className="py-2 font-medium  px-4 w-[7%] text-[#a64f40]">
+              {totalInventory}
+            </p>
+            <p className="py-2 font-medium  px-4 w-[10%]">
               {priceRange?.minVariantPrice?.amount}
             </p>
-            <p className="py-2 w-[13%] px-4">{createdAt.split("T")[0]}</p>
-            <p className="py-2 px-4 w-[13%]">{vendor}</p>
+            <p className="py-2  font-medium w-[13%] px-4">
+              {createdAt.split("T")[0]}
+            </p>
+            <p className="py-2 capitalize font-medium px-4 w-[13%]">{vendor}</p>
           </div>
         </div>
         {isExpanded &&
@@ -129,7 +137,7 @@ const DataTableComponent = ({
             <Loader />
           ) : (
             <div className=" flex flex-col gap-2 items-center p-5">
-              <div className="w-1/2">
+              <div className="w-[70%]">
                 <SubProduct
                   subProducts={subProducts}
                   setSubProducts={setSubProducts}
@@ -154,24 +162,24 @@ const DataTableComponent = ({
         <Loader />
       ) : (
         <div className="overflow-x-auto">
-          <div className="min-w-full p-2 text-xs rounded-lg  bg-white">
-            <div className="flex justify-between items-center border-b py-2">
-              <p className="py-2 font-semibold text-xs w-[20%]  text-left leading-4 text-gray-700 tracking-wider">
+          <div className="min-w-full   text-[13px] rounded-lg  bg-white">
+            <div className="flex justify-between items-center px-2 bg-[#f7f7f7] border py-1">
+              <p className="py-2 font-medium tracking-tight w-[20%]  text-left leading-4 text-[#616161] ">
                 Product
               </p>
-              <p className="py-2 font-semibold text-xs px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-medium tracking-tight px-4 w-[10%] text-left leading-4 text-[#616161] ">
                 Status
               </p>
-              <p className="py-2 font-semibold text-xs px-4 w-[7%] text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-medium tracking-tight px-4 w-[7%] text-left leading-4 text-[#616161] ">
                 Inventory
               </p>
-              <p className="py-2 font-semibold text-xs px-4 w-[10%] text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-medium tracking-tight px-4 w-[10%] text-left leading-4 text-[#616161] ">
                 Price
               </p>
-              <p className="py-2 font-semibold text-xs px-4 w-[13%] text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-medium tracking-tight px-4 w-[13%] text-left leading-4 text-[#616161] ">
                 Created At
               </p>
-              <p className="py-2 font-semibold text-xs w-[13%] px-4 text-left leading-4 text-gray-700 tracking-wider">
+              <p className="py-2 font-medium tracking-tight w-[13%] px-4 text-left leading-4 text-[#616161] ">
                 Vendor
               </p>
             </div>
