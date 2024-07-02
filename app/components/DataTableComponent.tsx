@@ -93,7 +93,7 @@ const DataTableComponent = ({
     return (
       <>
         <div
-          className={`hover:bg-gray-50 ${activeId === id ? "bg-gray-100" : ""} flex flex-col border-b items-center  justify-between cursor-pointer text-[#3b3b3b]`}
+          className={`hover:bg-gray-50 ${activeId === id ? "bg-gray-100" : ""} flex flex-col border-t items-center  justify-between cursor-pointer text-[#3b3b3b]`}
           key={index}
           onClick={() => handleClick(id, metafieldId)}
         >
@@ -115,16 +115,16 @@ const DataTableComponent = ({
             </p>
             <p className="py-2 font-medium  px-4 w-[10%]">
               <span
-                className={`bg-[#b4fed2] text-[#377b59] ${status === "ARCHIVED" ? "bg-[#f0f0f0]" : ""} ${status === "DRAFT" ? "bg-[#e6f3ff]" : ""} text-[10px] font-medium  p-[5px] rounded`}
+                className={`bg-[#b4fed2] text-[#377b59] ${status === "ARCHIVED" ? "bg-[#f0f0f0] text-gray-500" : ""} ${status === "DRAFT" ? "bg-[#e6f3ff]" : ""}  font-bold capitalize text-[11px] px-3 py-1 rounded-full`}
               >
-                {status}
+                {status?.toLowerCase()}
               </span>
             </p>
             <p className="py-2 font-medium  px-4 w-[7%] text-[#a64f40]">
               {totalInventory}
             </p>
             <p className="py-2 font-medium  px-4 w-[10%]">
-              {priceRange?.minVariantPrice?.amount}
+              £ {priceRange?.minVariantPrice?.amount}
             </p>
             <p className="py-2  font-medium w-[13%] px-4">
               {createdAt.split("T")[0]}
@@ -141,12 +141,9 @@ const DataTableComponent = ({
                 <SubProduct
                   subProducts={subProducts}
                   setSubProducts={setSubProducts}
-                  metaFieldId={metafield_Id}
-                  productId={product_Id}
                   fetchData={fetchData}
                   originalProduct={originalProduct}
                   mainId={id}
-                  setIsProductLoading={setIsProductLoading}
                 />
               </div>
               <div className="flex w-1/2 gap-5 items-center"></div>
@@ -162,8 +159,8 @@ const DataTableComponent = ({
         <Loader />
       ) : (
         <div className="overflow-x-auto">
-          <div className="min-w-full   text-[13px] rounded-lg  bg-white">
-            <div className="flex justify-between items-center px-2 bg-[#f7f7f7] border py-1">
+          <div className="min-w-full   text-[13px] bg-white">
+            <div className="flex justify-between items-center px-2 bg-[#f7f7f7]">
               <p className="py-2 font-medium tracking-tight w-[20%]  text-left leading-4 text-[#616161] ">
                 Product
               </p>

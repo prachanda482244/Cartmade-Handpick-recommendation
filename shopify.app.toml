@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://panel-cluster-construction-beat.trycloudflare.com"
+application_url = "https://eating-consumption-cheapest-massage.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://panel-cluster-construction-beat.trycloudflare.com/auth/callback",
-  "https://panel-cluster-construction-beat.trycloudflare.com/auth/shopify/callback",
-  "https://panel-cluster-construction-beat.trycloudflare.com/api/auth/callback"
+  "https://eating-consumption-cheapest-massage.trycloudflare.com/auth/callback",
+  "https://eating-consumption-cheapest-massage.trycloudflare.com/auth/shopify/callback",
+  "https://eating-consumption-cheapest-massage.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

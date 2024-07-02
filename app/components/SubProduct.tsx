@@ -2,25 +2,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MdDragIndicator } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { subProducts } from "~/config/typeConfig";
+import Loader from "./Loader";
+import { DefaultGallery } from "~/config/svgItem";
 
 const SubProduct = ({
   subProducts,
   setSubProducts,
   mainId,
-  metaFieldId,
   originalProduct,
-  productId,
   fetchData,
-  setIsProductLoading,
 }: {
   subProducts: subProducts[];
-  originalProduct: subProducts[];
   setSubProducts: any;
   mainId: string;
-  metaFieldId: string;
-  productId: string;
+  originalProduct: subProducts[];
   fetchData: any;
-  setIsProductLoading: any;
 }) => {
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [subproductId, setSubProductId] = useState<string[]>([]);
@@ -196,9 +192,9 @@ const SubProduct = ({
   };
 
   return (
-    <div className=" flex border  rounded-sm gap-[2px] flex-col">
+    <div className=" flex border rounded-lg flex-col">
       <AnimatePresence>
-        <div className=" flex flex-col gap-[1px] items-center">
+        <div className=" flex flex-col items-center">
           <div className="flex justify-between items-center border-b p-1  w-full">
             <h1 className="font-semibold px-2 text-lg tracking-tight  ">
               Recommended Products
@@ -212,14 +208,14 @@ const SubProduct = ({
               <button
                 disabled={subproductId.length === 0}
                 onClick={handleClick}
-                className="bg-red-500 rounded-md disabled:bg-red-300 hover:bg-red-700 py-2 px-6  text-white "
+                className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter Polaris-Button--toneCritical"
               >
                 Delete
               </button>
             </div>
           </div>
           <div className="flex justify-between  items-center border-b w-full px-2 py-4">
-            <p className=" font-semibold text-sm  w-[50%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
+            <p className=" font-semibold text-sm  w-[40%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
               Product title
             </p>
 
@@ -239,8 +235,8 @@ const SubProduct = ({
             key={index}
             onClick={() => handleDeleteProduct(product.id)}
             className={`flex cursor-pointer flex-col border-b items-center justify-between 
-              ${subproductId.includes(product.id) ? "bg-gray-200" : ""}
-              ${draggingIndex === index ? "bg-gray-200 " : ""}`}
+              ${subproductId.includes(product.id) ? "bg-gray-100" : ""}
+              ${draggingIndex === index ? "bg-gray-100 " : ""}`}
             initial={{ y: 0 }}
             animate={{
               y: 0,
@@ -257,45 +253,51 @@ const SubProduct = ({
             dragConstraints={{ top: 0, bottom: 0 }}
           >
             <div className="flex justify-between items-center w-full">
-              <motion.div
-                className="cursor-pointer px-2 py-1"
-                draggable={true}
-                onDragStart={(event: any) => handleDragStart(event, index)}
-                onDragOver={(event) => handleDragOver(event, index)}
-                onDrop={handleDrop}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <MdDragIndicator className="w-5 h-5" />
-              </motion.div>
+              <div className="flex items-center  w-[40%] px-2">
+                <motion.div
+                  className="cursor-pointer  px-2 py-1"
+                  draggable={true}
+                  onDragStart={(event: any) => handleDragStart(event, index)}
+                  onDragOver={(event) => handleDragOver(event, index)}
+                  onDrop={handleDrop}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <MdDragIndicator className="w-5 h-5" />
+                </motion.div>
+                <div>
+                  <p className="py-2 px-4 font-medium  flex items-center gap-4">
+                    <span className="border w-10 flex  items-center justify-center h-10 rounded-lg ">
+                      {product.featuredImage === null ? (
+                        <DefaultGallery />
+                      ) : (
+                        <img
+                          src={product.featuredImage.url}
+                          alt="product"
+                          className="w-8 h-8"
+                        />
+                      )}
+                    </span>
+                    <span className="">{product?.title}</span>
+                  </p>
+                </div>
+              </div>
 
-              <p className="py-2 px-4  flex items-center w-[40%]">
-                <img
-                  src={
-                    product.featuredImage === null
-                      ? "https://www.electriciens-sans-frontieres.org/web/app/plugins/wp-media-folder/assets/images/gallery_hover-avada.svg"
-                      : product.featuredImage?.url
-                  }
-                  alt="Product"
-                  className="w-10 h-10"
-                />
-                {product.title}
-              </p>
               <p className="py-2 px-4  text-red-600">
                 {product.totalInventory}
               </p>
               <p className="py-2 px-4 w-[14%] ">
-                {product.priceRange?.minVariantPrice?.amount}
+                £ {product.priceRange?.minVariantPrice?.amount}
               </p>
-              <p className="py-2 px-4 w-[20%]">{product.vendor}</p>
+              <p className="py-2 px-4 w-[20%] capitalize">{product.vendor}</p>
             </div>
           </motion.div>
         ))}
-        <div className="flex gap-2 py-2 px-2 items-center">
+        <div className="flex gap-2 py-2 px-2 items-center justify-between">
           {subProducts === undefined ? (
             <button
               onClick={handleAddRelatedProduct}
-              className="bg-sky-400 hover:bg-sky-600 py-2 px-4 items-start text-white rounded-md tracking-wider"
+              className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
             >
               Add Product
             </button>
@@ -303,14 +305,14 @@ const SubProduct = ({
             <>
               <button
                 onClick={handleEdiRelatedProduct}
-                className="bg-green-400 hover:bg-green-600 py-2 px-4 items-start text-white rounded-md tracking-wider"
+                className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantSecondary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
               >
                 Edit Product
               </button>
               {condition && (
                 <button
                   onClick={handleSaveChanges}
-                  className="bg-blue-500 py-2 hover:bg-blue-600 px-4 text-white rounded-md tracking-wider"
+                  className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
                 >
                   Save changes
                 </button>

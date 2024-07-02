@@ -155,35 +155,39 @@ const Dashboard = () => {
     <Page title="Dashboard" fullWidth={true}>
       <Layout>
         <Layout.Section>
-          <div className=" flex bg-white border rounded-tl-lg rounded-tr-lg py-3 px-4 justify-between items-center">
-            <p className="text-base text-[#5d5d5d]">All products</p>
-            <Form noValidate onSubmit={() => handleSubmit(inputValue)}>
-              <FormLayout>
-                <div className="flex items-center gap-2">
-                  <TextField
-                    label=""
-                    value={inputValue}
-                    onChange={handleChange}
-                    placeholder="Search products"
-                    type="search"
-                    autoComplete="off"
-                  />
+          <div className="border overflow-hidden rounded-lg">
+            <div className="flex bg-white borde-0 rounded-tl-lg rounded-tr-lg py-2 px-4 justify-between items-center">
+              <p className="text-base text-[#5d5d5d] font-semibold">
+                All products
+              </p>
+              <Form noValidate onSubmit={() => handleSubmit(inputValue)}>
+                <FormLayout>
+                  <div className="flex items-center gap-2">
+                    <TextField
+                      label=""
+                      value={inputValue}
+                      onChange={handleChange}
+                      placeholder="Search products"
+                      type="search"
+                      autoComplete="off"
+                    />
 
-                  <Button variant="secondary" submit>
-                    Search
-                  </Button>
-                </div>
-              </FormLayout>
-            </Form>
+                    <Button variant="secondary" submit>
+                      Search
+                    </Button>
+                  </div>
+                </FormLayout>
+              </Form>
+            </div>
+
+            <DataTableComponent
+              pageInformation={pageInformation}
+              handleNextPagination={handleNextPagination}
+              handlePrevPagination={handlePrevPagination}
+              products={products}
+              isLoading={isLoading}
+            />
           </div>
-
-          <DataTableComponent
-            pageInformation={pageInformation}
-            handleNextPagination={handleNextPagination}
-            handlePrevPagination={handlePrevPagination}
-            products={products}
-            isLoading={isLoading}
-          />
         </Layout.Section>
       </Layout>
     </Page>
