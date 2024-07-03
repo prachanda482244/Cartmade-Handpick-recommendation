@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { MinusIcon } from "@shopify/polaris-icons";
 import { MdDragIndicator } from "react-icons/md";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { subProducts } from "~/config/typeConfig";
-import Loader from "./Loader";
 import { DefaultGallery } from "~/config/svgItem";
+import { Checkbox, Icon } from "@shopify/polaris";
 
 const SubProduct = ({
   subProducts,
@@ -206,32 +207,42 @@ const SubProduct = ({
               Recommended Products
             </h1>
             <div className="flex items-center gap-2 ">
-              <button
-                disabled={subproductId.length === 0}
-                onClick={handleClick}
-                className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter Polaris-Button--toneCritical"
-              >
-                Delete
-              </button>
+              {subproductId.length !== 0 && (
+                <button
+                  onClick={handleClick}
+                  className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter Polaris-Button--toneCritical"
+                >
+                  Delete
+                </button>
+              )}
             </div>
           </div>
           <div className="flex justify-between  items-center border-b w-full px-2 py-4">
             <p className=" font-semibold text-sm  w-[40%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
               {subproductId.length !== 0 ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked
-                    className="h-4 w-4 cursor-pointer"
-                    onChange={() => {
-                      setSubProductId(
-                        subproductId.length !== initialIds.length
-                          ? initialIds
-                          : [],
-                      );
-                    }}
+                <div
+                  onClick={() => {
+                    setSubProductId(
+                      subproductId.length !== initialIds.length
+                        ? initialIds
+                        : [],
+                    );
+                  }}
+                  className="flex items-center gap-2 relative font-semibold"
+                >
+                  <Checkbox
+                    label
+                    labelHidden
+                    checked={subproductId.length === initialIds.length}
                   />
-                  {subproductId.length + " selected"}
+                  {subproductId.length !== initialIds.length && (
+                    <div className="absolute -left-[1px] ">
+                      <Icon source={MinusIcon} tone="base" />
+                    </div>
+                  )}
+                  <label className="cursor-pointer">
+                    {subproductId.length + " selected"}
+                  </label>
                 </div>
               ) : (
                 "Product title"

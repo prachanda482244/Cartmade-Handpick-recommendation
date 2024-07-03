@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://thorough-plugins-amendments-sheffield.trycloudflare.com"
+application_url = "https://hourly-img-plot-brilliant.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://thorough-plugins-amendments-sheffield.trycloudflare.com/auth/callback",
-  "https://thorough-plugins-amendments-sheffield.trycloudflare.com/auth/shopify/callback",
-  "https://thorough-plugins-amendments-sheffield.trycloudflare.com/api/auth/callback"
+  "https://hourly-img-plot-brilliant.trycloudflare.com/auth/callback",
+  "https://hourly-img-plot-brilliant.trycloudflare.com/auth/shopify/callback",
+  "https://hourly-img-plot-brilliant.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
