@@ -77,6 +77,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         console.error(`Product at index ${i} is missing id`);
       }
     }
+
     const graphQlId = productIds.map((id) => `"//${id}//"`);
     const graphqlQuery = queryF(mainProductId, graphQlId);
     console.log(graphqlQuery);

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 
 const route = () => {
@@ -8,6 +9,13 @@ const route = () => {
       multiple: true,
     });
     setProduct(selected);
+    const id = selected?.map(({ id }) => id);
+    console.log(id);
+    const { data } = await axios.post("/api/test", {
+      reponse: id,
+      anotherId: 32423,
+    });
+    console.log(data);
   };
 
   const handleEditProduct = async () => {
@@ -30,8 +38,6 @@ const route = () => {
       multiple: 4,
     });
   };
-
-  console.log(product);
 
   return (
     <div>

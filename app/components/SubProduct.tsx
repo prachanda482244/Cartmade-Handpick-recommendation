@@ -1,10 +1,11 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, DragControls } from "framer-motion";
 import { MinusIcon } from "@shopify/polaris-icons";
 import { MdDragIndicator } from "react-icons/md";
 import { useState } from "react";
 import { subProducts } from "~/config/typeConfig";
 import { DefaultGallery } from "~/config/svgItem";
 import { Checkbox, Icon } from "@shopify/polaris";
+import axios from "axios";
 
 const SubProduct = ({
   subProducts,
@@ -94,7 +95,7 @@ const SubProduct = ({
     try {
       const selected = await shopify.resourcePicker({
         type: "product",
-        multiple: 4,
+        multiple: true,
         filter: {
           variants: false,
           archived: false,
@@ -127,7 +128,7 @@ const SubProduct = ({
     }
   };
 
-  const handleEdiRelatedProduct = async () => {
+  const handleEditRelatedProduct = async () => {
     const arrayId = subProducts.map((product: any) => {
       return {
         id: product.id,
@@ -137,8 +138,8 @@ const SubProduct = ({
       const selected = await shopify.resourcePicker({
         type: "product",
         selectionIds: arrayId,
-        multiple: 4,
-        action: "add",
+        multiple: true,
+        action: "select",
         filter: {
           variants: false,
           archived: false,
@@ -174,12 +175,6 @@ const SubProduct = ({
       );
     }
   };
-
-  if (handleEdiRelatedProduct) {
-    console.log(handleEdiRelatedProduct);
-  } else {
-    console.log("Picker was cancelled by the user");
-  }
 
   const handleSaveChanges = async () => {
     const queryString = updatedProductIds
@@ -334,7 +329,7 @@ const SubProduct = ({
           ) : (
             <>
               <button
-                onClick={handleEdiRelatedProduct}
+                onClick={handleEditRelatedProduct}
                 className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantSecondary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
               >
                 Edit Product
