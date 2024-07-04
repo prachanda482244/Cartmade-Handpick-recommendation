@@ -44,8 +44,8 @@ const DataTableComponent = ({
       if (response.ok) {
         setIsProductLoading(false);
         const { data } = await response.json();
-        setSubProducts(data[0]);
-        setOriginalProduct(data[0]);
+        setSubProducts(data);
+        setOriginalProduct(data);
       } else {
         setIsProductLoading(false);
 

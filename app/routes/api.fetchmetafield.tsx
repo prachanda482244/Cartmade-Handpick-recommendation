@@ -32,45 +32,39 @@ export async function loader({ request }: LoaderFunctionArgs) {
       });
     }
 
-    const productQueries = productQueryIds
-      .map(
-        (id, index) => `
-          product${index}: product(id: "${id}") {
-            id
-            title
-            description
-            totalInventory
-            vendor
-             featuredImage {
-              url
-            }
-             priceRange {
-              minVariantPrice {
-                amount
-                currencyCode
-              }
+    const GET_PRODUCTS_BY_IDS_QUERY = `
+    query GetProductsByIds($ids: [ID!]!) {
+      nodes(ids: $ids) {
+        ... on Product {
+          id
+          title
+          description
+          totalInventory
+          vendor
+          featuredImage {
+            url
+          }
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
             }
           }
-        `,
-      )
-      .join("\n");
-
-    const graphqlQuery = `
-      query {
-        ${productQueries}
+        }
       }
-    `;
+    }`;
 
-    const response = await admin.graphql(graphqlQuery);
+    const response = await admin.graphql(GET_PRODUCTS_BY_IDS_QUERY, {
+      variables: {
+        ids: productQueryIds,
+      },
+    });
     const productDetails: any = await response.json();
-    const products = Object.values(productDetails);
-    const productArray = products.map((productArr: any) =>
-      Object.values(productArr),
-    );
 
+    const mainData = productDetails.data.nodes;
     return json({
       success: true,
-      data: productArray,
+      data: mainData,
       message: "Product details fetched successfully",
     });
   } catch (error: any) {

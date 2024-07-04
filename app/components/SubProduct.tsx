@@ -193,6 +193,7 @@ const SubProduct = ({
       "gid://shopify/Product/" + data.data.product_id,
     );
   };
+  console.log(subProducts);
   return (
     <div className=" flex border rounded-lg flex-col">
       <AnimatePresence>
@@ -255,69 +256,70 @@ const SubProduct = ({
             </p>
           </div>
         </div>
-        {subProducts?.map((product: any, index: number) => (
-          <motion.div
-            key={index}
-            onClick={() => handleDeleteProduct(product.id)}
-            className={`flex cursor-pointer flex-col border-b items-center justify-between 
+        {subProducts &&
+          subProducts?.map((product: any, index: number) => (
+            <motion.div
+              key={index}
+              onClick={() => handleDeleteProduct(product.id)}
+              className={`flex cursor-pointer flex-col border-b items-center justify-between 
               ${subproductId.includes(product.id) ? "bg-gray-100" : ""}
               ${draggingIndex === index ? "bg-gray-100 " : ""}`}
-            initial={{ y: 0 }}
-            animate={{
-              y: 0,
-              transition: {
-                duration: 0.3,
-                type: "spring",
-                damping: 20,
-                stiffness: 300,
-              },
-            }}
-            exit={{ opacity: 0, y: -50 }}
-            onDragOver={(event) => handleDragOver(event, index)}
-            onDrop={handleDrop}
-            dragConstraints={{ top: 0, bottom: 0 }}
-          >
-            <div className="flex justify-between items-center w-full">
-              <div className="flex items-center  w-[40%] px-2">
-                <motion.div
-                  className="cursor-pointer  px-2 py-1"
-                  draggable={true}
-                  onDragStart={(event: any) => handleDragStart(event, index)}
-                  onDragOver={(event) => handleDragOver(event, index)}
-                  onDrop={handleDrop}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <MdDragIndicator className="w-5 h-5" />
-                </motion.div>
-                <div>
-                  <p className="py-2 px-4 font-medium  flex items-center gap-4">
-                    <span className="border w-10 flex  items-center justify-center h-10 rounded-lg ">
-                      {product.featuredImage === null ? (
-                        <DefaultGallery />
-                      ) : (
-                        <img
-                          src={product.featuredImage.url}
-                          alt="product"
-                          className="w-8 h-8"
-                        />
-                      )}
-                    </span>
-                    <span className="">{product?.title}</span>
-                  </p>
+              initial={{ y: 0 }}
+              animate={{
+                y: 0,
+                transition: {
+                  duration: 0.3,
+                  type: "spring",
+                  damping: 20,
+                  stiffness: 300,
+                },
+              }}
+              exit={{ opacity: 0, y: -50 }}
+              onDragOver={(event) => handleDragOver(event, index)}
+              onDrop={handleDrop}
+              dragConstraints={{ top: 0, bottom: 0 }}
+            >
+              <div className="flex justify-between items-center w-full">
+                <div className="flex items-center  w-[40%] px-2">
+                  <motion.div
+                    className="cursor-pointer  px-2 py-1"
+                    draggable={true}
+                    onDragStart={(event: any) => handleDragStart(event, index)}
+                    onDragOver={(event) => handleDragOver(event, index)}
+                    onDrop={handleDrop}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <MdDragIndicator className="w-5 h-5" />
+                  </motion.div>
+                  <div>
+                    <p className="py-2 px-4 font-medium  flex items-center gap-4">
+                      <span className="border w-10 flex  items-center justify-center h-10 rounded-lg ">
+                        {product.featuredImage === null ? (
+                          <DefaultGallery />
+                        ) : (
+                          <img
+                            src={product.featuredImage.url}
+                            alt="product"
+                            className="w-8 h-8"
+                          />
+                        )}
+                      </span>
+                      <span className="">{product?.title}</span>
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <p className="py-2 px-4  text-red-600">
-                {product.totalInventory}
-              </p>
-              <p className="py-2 px-4 w-[14%] ">
-                £ {product.priceRange?.minVariantPrice?.amount}
-              </p>
-              <p className="py-2 px-4 w-[20%] capitalize">{product.vendor}</p>
-            </div>
-          </motion.div>
-        ))}
+                <p className="py-2 px-4  text-red-600">
+                  {product.totalInventory}
+                </p>
+                <p className="py-2 px-4 w-[14%] ">
+                  £ {product.priceRange?.minVariantPrice?.amount}
+                </p>
+                <p className="py-2 px-4 w-[20%] capitalize">{product.vendor}</p>
+              </div>
+            </motion.div>
+          ))}
         <div className="flex gap-2 py-2 px-2 items-center justify-between">
           {subProducts === undefined ? (
             <button

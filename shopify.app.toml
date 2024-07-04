@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://bad-litigation-stays-alive.trycloudflare.com"
+application_url = "https://keywords-experiences-hong-bible.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://bad-litigation-stays-alive.trycloudflare.com/auth/callback",
-  "https://bad-litigation-stays-alive.trycloudflare.com/auth/shopify/callback",
-  "https://bad-litigation-stays-alive.trycloudflare.com/api/auth/callback"
+  "https://keywords-experiences-hong-bible.trycloudflare.com/auth/callback",
+  "https://keywords-experiences-hong-bible.trycloudflare.com/auth/shopify/callback",
+  "https://keywords-experiences-hong-bible.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
