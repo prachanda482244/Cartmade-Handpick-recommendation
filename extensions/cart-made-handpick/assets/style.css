@@ -1,0 +1,185 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+.hprWrapper {
+  font-family: inherit;
+  margin-top: 60px;
+  margin-bottom: 60px;
+}
+.hprWrapper * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.hprWrapper .hprTitle {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+.hprWrapper img {
+  width: 100%;
+}
+.hprWrapper .hprContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+.hprWrapper .hprCardWrapper {
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 0 10px #eee;
+}
+.hprWrapper .hprCardWrapper .hprCardInner .productContentHolder {
+  padding: 10px 15px;
+}
+.hprWrapper .hprCardWrapper .hprCardInner .hprpriceWrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.hprWrapper .hprCardWrapper .hprCardInner .hprpriceWrapper .hprproductPrice {
+  font-size: 18px;
+  color: red;
+}
+.hprWrapper .hprCardWrapper .hprCardInner .hprpriceWrapper .hprcomparedAtPrice {
+  color: grey;
+  font-size: 16px;
+  text-decoration: line-through;
+}
+.hprWrapper .hprCardWrapper .hprCardInner a {
+  text-decoration: none;
+}
+.hprWrapper .hprCardWrapper .hprCardInner * {
+  color: #000;
+}
+.hprWrapper .hprCardWrapper .hprCardInner .hprvendorName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #f69191;
+}
+.hprWrapper .hprCardWrapper .hprCardInner h5 {
+  font-size: 24px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.hprWrapper .hprCardWrapper .hprCardInner h5:hover {
+  color: #f69191;
+}
+.hprWrapper .addToCartHolder .hpratcBtn {
+  font-size: 18px;
+  padding: 6px 17px;
+  background-color: #f69191;
+  border: 2px #f69191 solid;
+  margin: 4px 15px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+.hprWrapper .addToCartHolder .hpratcBtn:hover {
+  background-color: #fff;
+  color: #f69191;
+}
+.hprWrapper .hprswiper-button-prev,
+.hprWrapper .hprswiper-button-next {
+  background: #f69191;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  padding: 13px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  left: -20px;
+}
+.hprWrapper .hprswiper-button-next {
+  left: unset;
+  right: -20px;
+}
+
+.hprgrid4 {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  gap: 20px;
+}
+
+.hprgrid3 {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 20px;
+}
+
+.hprgrid2 {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 20px;
+}
+
+.hprgrid1 {
+  display: grid;
+  grid-template-columns: auto;
+  gap: 20px;
+}
+
+.hprgrid5 {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  gap: 20px;
+}
+
+.hprgrid6 {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto;
+  gap: 20px;
+}
+.img-sqaure {
+  aspect-ratio: 1/1;
+}
+.img-adapt_to_image {
+  aspect-ratio: 1/2;
+}
+.img-portrait {
+  aspect-ratio: 2/3;
+}
+
+@media (max-width: 768px) {
+  .hprWrapper .hprTitle {
+    font-size: 28px;
+    text-align: left;
+    max-width: calc(100% - 80px);
+  }
+  .hprWrapper .hprCardWrapper .hprCardInner h5 {
+    font-size: 18px;
+  }
+  .hprWrapper .hprCardWrapper .hprCardInner .hprpriceWrapper .hprproductPrice {
+    font-size: 14px;
+  }
+  .hprWrapper
+    .hprCardWrapper
+    .hprCardInner
+    .hprpriceWrapper
+    .hprcomparedAtPrice {
+    font-size: 12px;
+  }
+  .hprWrapper .addToCartHolder .hpratcBtn {
+    font-size: 14px;
+  }
+  .hprWrapper .hprswiper-button-prev,
+  .hprWrapper .hprswiper-button-next {
+    right: 0;
+    top: 10%;
+    width: 30px;
+    height: 30px;
+    padding: 2px 10px;
+    left: unset;
+  }
+  .hprWrapper .hprswiper-button-prev {
+    right: 40px;
+  }
+} /*# sourceMappingURL=style.css.map */

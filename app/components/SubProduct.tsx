@@ -91,6 +91,36 @@ const SubProduct = ({
     );
   };
 
+  // Testing
+  // const handleClick = async () => {
+  //   const parts: any = mainId?.split("/");
+  //   const productId = parseInt(parts[parts?.length - 1]);
+
+  //   const deletedIds = allSubProductId.filter(
+  //     (item) => !subproductId.includes(item),
+  //   );
+  //   // Serialize the product IDs into a query string format
+  //   console.log(deletedIds, "Deleted ids");
+  //   console.log(productId, "product id");
+
+  //   const { data } = await axios.post("/api/test", {
+  //     mainProductId: productId,
+  //     productIds: deletedIds,
+  //   });
+  //   console.log(data);
+  //   // const response = await fetch(
+  //   //   `/api/metafield?${queryString}&mainProductId=${productId}`,
+  //   // );
+
+  //   // const data = await response.json();
+  //   // fetchData(
+  //   //   "gid://shopify/Product/" + data.data.id,
+  //   //   "gid://shopify/Product/" + data.data.product_id,
+  //   // );
+  // };
+
+  // End test function
+
   const handleAddRelatedProduct = async () => {
     try {
       const selected = await shopify.resourcePicker({
@@ -193,7 +223,6 @@ const SubProduct = ({
       "gid://shopify/Product/" + data.data.product_id,
     );
   };
-  console.log(subProducts);
   return (
     <div className=" flex border rounded-lg flex-col">
       <AnimatePresence>
@@ -321,7 +350,7 @@ const SubProduct = ({
             </motion.div>
           ))}
         <div className="flex gap-2 py-2 px-2 items-center justify-between">
-          {subProducts === undefined ? (
+          {!subProducts.length ? (
             <button
               onClick={handleAddRelatedProduct}
               className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"

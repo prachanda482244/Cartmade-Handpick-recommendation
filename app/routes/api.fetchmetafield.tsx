@@ -60,7 +60,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
     const productDetails: any = await response.json();
-
     const mainData = productDetails.data.nodes;
     return json({
       success: true,
