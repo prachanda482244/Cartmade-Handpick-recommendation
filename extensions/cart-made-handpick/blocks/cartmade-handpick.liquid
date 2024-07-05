@@ -74,7 +74,7 @@
                           <div class="addToCartHolder">
 
                             {% if block.settings.variants=="add_to_cart" %}
-                            <button onClick="addToCart(event)" class="hpratcBtn add-to-cart" data-variantId="{{  }}" >
+                            <button onClick="addToCart(event)" class="hpratcBtn add-to-cart" style="background-color: {{ block.settings.change_color }};" >
                               {{ block.settings.button_title }}
                             </button>
                             {% else if block.settings.variants=="view_details" %}
@@ -142,13 +142,11 @@
   const cardWrapper = event.target.closest('.hprCardWrapper');
   cardWrapper.querySelector('.hprproductPrice').innerHTML = price;
   
-  // Update image if imageSrc exists
   if (imageSrc) {
     cardWrapper.querySelector('.product-image').src = imageSrc;
    }
  }
       function addToCart(e){
-        console.log((e.target.closest('.hprCardWrapper').querySelector('.num-variants')))
         if(parseInt(e.target.closest('.hprCardWrapper').querySelector('.num-variants').value) === 1 ){
           let variantId=  e.target.closest('.hprCardWrapper').querySelector('.first-variant-id').value 
             const data = {
@@ -157,7 +155,6 @@
               }
             addToCartAjax(data)
         }else{
-          console.log(e.target.closest('.hprCardWrapper').querySelector('select'))
           let variantId = e.target.closest('.hprCardWrapper').querySelector('select').value 
           const data = {
                 id: variantId,
@@ -167,7 +164,7 @@
         }
       }
     
-     function addToCartAjax(item){
+     function addToCartAjax(item){   
         fetch('/cart/add.js', {
             method: 'POST',
             headers: {
@@ -211,6 +208,7 @@
         ],
         "default": "add_to_cart"
       },
+   
       {
         "type": "checkbox",
         "id": "show_vendor",
@@ -226,6 +224,11 @@
           { "value": "static", "label": "Static Grid" }
         ],
         "default": "slider"
+      },
+      {
+        "type": "color",
+        "id":"change_color",
+         "label": "Change Button color"
       },
       {
         "type": "range",
