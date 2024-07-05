@@ -73,6 +73,7 @@ body {
   padding: 6px 17px;
   background-color: #f69191;
   border: 2px #f69191 solid;
+  color: white;
   margin: 4px 15px;
   cursor: pointer;
   border-radius: 4px;
@@ -80,7 +81,8 @@ body {
 }
 .hprWrapper .addToCartHolder .hpratcBtn:hover {
   background-color: #fff;
-  color: #f69191;
+  /* color: #f69191; */
+  color: #000;
 }
 .hprWrapper .hprswiper-button-prev,
 .hprWrapper .hprswiper-button-next {
