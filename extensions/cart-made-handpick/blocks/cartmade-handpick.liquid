@@ -32,7 +32,7 @@
                     <div class="hprCardWrapper">
                       <div class="hprCardInner">
                         <a href="{{ product.url }}">
-                          <img class="img-{{ block.settings.image_ratio }}" src="{{ product.featured_image | img_url }}" alt="{{ product.title }}">
+                          <img class="img-{{ block.settings.image_ratio }} product-image" src="{{ product.featured_image | img_url }}" alt="{{ product.title }}">
                           <div class="productContentHolder">
                             {% if block.settings.show_vendor %}
                             <div class="hprvendorName">
@@ -62,7 +62,7 @@
                       <select class="select-variant" onchange="updatePrice(event)">
                         {% for variant in product.variants %}
                           {% if variant.title !="Default Title" %}
-                                 <option data-price="{{ variant.price | money }}"  value="{{variant.id}}">{{ variant.title }}</option>
+                                 <option data-price="{{ variant.price | money }}" data-img="{{ variant.image.src  |  default: product.featured_image  |  image_url  }}" value="{{variant.id}}">{{ variant.title }}</option>
                                 {% endif %}
                               {% endfor %}
                                 </select> 
@@ -136,8 +136,17 @@
     </script>
     <script>
       function updatePrice(e){
-        e.target.closest('.hprCardWrapper').querySelector('.hprproductPrice').innerHTML = e.target.options[e.target.selectedIndex].getAttribute('data-price')
-      }
+        const selectedOption = event.target.options[event.target.selectedIndex];
+  const price = selectedOption.getAttribute('data-price');
+  const imageSrc = selectedOption.getAttribute('data-img');
+  const cardWrapper = event.target.closest('.hprCardWrapper');
+  cardWrapper.querySelector('.hprproductPrice').innerHTML = price;
+  
+  // Update image if imageSrc exists
+  if (imageSrc) {
+    cardWrapper.querySelector('.product-image').src = imageSrc;
+   }
+ }
       function addToCart(e){
         console.log((e.target.closest('.hprCardWrapper').querySelector('.num-variants')))
         if(parseInt(e.target.closest('.hprCardWrapper').querySelector('.num-variants').value) === 1 ){
