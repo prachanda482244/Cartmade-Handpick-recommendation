@@ -1,6 +1,7 @@
 {{ 'style.css' | asset_url | stylesheet_tag }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
+
 {% assign recommended_products = product.metafields.custom.recommended_produccts.value %}
 {%if recommended_products != blank%}
 <div class="hprWrapper">
@@ -21,7 +22,7 @@
                 {% endif %}
 
                 {% for product in recommended_products %}
-
+                  
                 {% if block.settings.grid_type == 'static' %}
                 <div class="hprgridSingle">
                   {% else %}
@@ -45,17 +46,45 @@
                               <span class="hprproductPrice">
                                 {{ product.price | money }}
                               </span>
-                              <span class="hprcomparedAtPrice"> $ 550 GPA </span>
+                              <span class="hprcomparedAtPrice"> {{ product.first_available_variant.compare_at_price |  money}} </span>
                             </div>
                           </div>
                     </a>
+                  
+                    <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
+                    <input type="hidden" value="{{ product.first_available_variant.id }}" class="first-variant-id" />
+                  <div>
+                     {% if block.settings.variants=="add_to_cart"  %}
+                      {% assign numVariants = product.variants.size %}
+                      {% if numVariants == 1  %}
 
+                        {% else %}
+                      <select class="select-variant" onchange="updatePrice(event)">
+                        {% for variant in product.variants %}
+                          {% if variant.title !="Default Title" %}
+                                 <option data-price="{{ variant.price | money }}"  value="{{variant.id}}">{{ variant.title }}</option>
+                                {% endif %}
+                              {% endfor %}
+                                </select> 
+                            {%endif%}               
+                {% endif %}
+
+
+                     </div>
                           <div class="addToCartHolder">
-                            {% if block.settings.show_add_to_cart %}
-                            <button class="hpratcBtn add-to-cart" >
+
+                            {% if block.settings.variants=="add_to_cart" %}
+                            <button onClick="addToCart(event)" class="hpratcBtn add-to-cart" data-variantId="{{  }}" >
                               {{ block.settings.button_title }}
                             </button>
+                            {% else if block.settings.variants=="view_details" %}
+                             <button class="hpratcBtn add-to-cart" >
+                              <a href="{{ product.url }}">
+                                View Details
+                                </a>
+                             </button>
                             {% endif %}
+
                           </div>
                         </div>
                       </div>
@@ -66,6 +95,7 @@
                   {% else %}
                 </div>
                 {% endif %}
+
                 {% endfor %}
               </div>
             </div>
@@ -104,18 +134,45 @@
         });
     });
     </script>
-
     <script>
-      const addToCart = document.querySelectorAll(".add-to-cart");
-      console.log(addToCart)
-      addToCart.forEach(button=>{
-        button.addEventListener("click",(e)=>{
-          
-          console.log(e.target)
-
-        })
-      })
+      function updatePrice(e){
+        e.target.closest('.hprCardWrapper').querySelector('.hprproductPrice').innerHTML = e.target.options[e.target.selectedIndex].getAttribute('data-price')
+      }
+      function addToCart(e){
+        console.log((e.target.closest('.hprCardWrapper').querySelector('.num-variants')))
+        if(parseInt(e.target.closest('.hprCardWrapper').querySelector('.num-variants').value) === 1 ){
+          let variantId=  e.target.closest('.hprCardWrapper').querySelector('.first-variant-id').value 
+            const data = {
+                id: variantId,
+                quantity: 1 
+              }
+            addToCartAjax(data)
+        }else{
+          console.log(e.target.closest('.hprCardWrapper').querySelector('select'))
+          let variantId = e.target.closest('.hprCardWrapper').querySelector('select').value 
+          const data = {
+                id: variantId,
+                quantity: 1 
+              }
+              addToCartAjax(data)
+        }
+      }
+    
+     function addToCartAjax(item){
+        fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(item)
+          }).then(response => response.json())
+          .then((data)=>{
+            window.location.href = "/cart"
+          })  
+      }
     </script>
+
 {%endif%}
 
 {% schema %}
@@ -136,16 +193,20 @@
         "default": "Add to cart"
       },
       {
+        "type": "radio",
+        "id": "variants",
+        "label": "Variants layout",
+        "options": [
+          { "value": "add_to_cart", "label": "Show Add to Cart Button" },
+          { "value": "view_details", "label": "Show View Details Button" }
+        ],
+        "default": "add_to_cart"
+      },
+      {
         "type": "checkbox",
         "id": "show_vendor",
         "label": "Show Vendor",
         "default": false
-      },
-      {
-        "type": "checkbox",
-        "id": "show_add_to_cart",
-        "label": "Show Add to Cart Button",
-        "default": true
       },
       {
         "type": "radio",
