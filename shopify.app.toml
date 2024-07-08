@@ -3,7 +3,7 @@
 client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
 name = "cartmade-handpickup"
 handle = "cartmade-handpickup"
-application_url = "https://sailing-manor-coming-anger.trycloudflare.com"
+application_url = "https://tumor-nj-spaces-pix.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://sailing-manor-coming-anger.trycloudflare.com/auth/callback",
-  "https://sailing-manor-coming-anger.trycloudflare.com/auth/shopify/callback",
-  "https://sailing-manor-coming-anger.trycloudflare.com/api/auth/callback"
+  "https://tumor-nj-spaces-pix.trycloudflare.com/auth/callback",
+  "https://tumor-nj-spaces-pix.trycloudflare.com/auth/shopify/callback",
+  "https://tumor-nj-spaces-pix.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

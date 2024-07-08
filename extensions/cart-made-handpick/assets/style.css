@@ -11,6 +11,7 @@ body {
 .hprWrapper * {
   box-sizing: border-box;
   margin: 0;
+
   padding: 0;
 }
 .hprWrapper .hprTitle {
@@ -18,8 +19,20 @@ body {
   text-align: center;
   margin-bottom: 40px;
 }
+
+figure {
+  margin: 0;
+  padding: 0;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
 .hprWrapper img {
+  height: 250px;
   width: 100%;
+  object-fit: cover;
+  object-position: top;
+
+  min-width: 100%;
 }
 .hprWrapper .hprContainer {
   max-width: 1200px;
@@ -27,7 +40,8 @@ body {
   position: relative;
 }
 .hprWrapper .hprCardWrapper {
-  border-radius: 5px;
+  /* border: 2px solid red; */
+  border-radius: 16px;
   overflow: hidden;
   background-color: #fff;
   box-shadow: 0 0 10px #eee;
@@ -61,23 +75,25 @@ body {
   color: #f69191;
 }
 .hprWrapper .hprCardWrapper .hprCardInner h5 {
-  font-size: 24px;
+  font-size: 18px;
   padding-top: 10px;
   padding-bottom: 10px;
+  height: 55px;
 }
-.hprWrapper .hprCardWrapper .hprCardInner h5:hover {
+/* .hprWrapper .hprCardWrapper .hprCardInner h5:hover {
   color: #f69191;
-}
+} */
 .hprWrapper .addToCartHolder .hpratcBtn {
   font-size: 18px;
   padding: 6px 17px;
-  background-color: #f69191;
-  border: 2px #f69191 solid;
+  background-color: var(--hprprimaryColor);
+  border: 2px var(--hprprimaryColor) solid;
   color: white;
   margin: 4px 15px;
   cursor: pointer;
   border-radius: 4px;
   margin-bottom: 15px;
+  width: var(--hprprimaryWidth);
 }
 .hprWrapper .addToCartHolder .hpratcBtn:hover {
   background-color: #fff;
@@ -149,14 +165,24 @@ body {
 .img-portrait {
   aspect-ratio: 2/3;
 }
+
+.selection_type {
+  padding: 10px;
+  min-width: max-content;
+  min-height: 60px;
+  margin: 0 auto;
+}
+
 .select-variant {
-  width: 50%;
+  width: 80%;
+  padding: 10px;
   font-size: 19px;
   outline: none;
   cursor: pointer;
-  box-shadow: 4px 2px 2px black;
+  box-shadow: 4px 2px 2px purple;
   font-family: "Antique Olive";
 }
+
 @media (max-width: 768px) {
   .hprWrapper .hprTitle {
     font-size: 28px;
