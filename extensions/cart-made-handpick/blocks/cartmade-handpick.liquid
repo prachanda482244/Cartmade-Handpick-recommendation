@@ -8,8 +8,10 @@
   {% assign items_per_row = block.settings.items_per_row %}
   <style>
     .hprContainer{
-      --hprprimaryColor: {{ block.settings.button_color }};
-      --hprprimaryWidth:{{ block.settings.button_width }}px;
+      --hprTitleColor: {{ block.settings.title_color }};
+      --hprPriceColor: {{ block.settings.price_color }};
+      --hprButtonColor: {{ block.settings.button_color }};
+      --hprPrimaryWidth:{{ block.settings.button_width }}px;
     }
   </style>
   <div class="hprContainer">
@@ -38,8 +40,8 @@
                     <div class="hprCardWrapper">
                       <div class="hprCardInner">
                         <a href="{{ product.url }}">
-                          <figure>
-                            <img class="img-{{ block.settings.image_ratio }} product-image"
+                          <figure class="figure-{{ block.settings.image_ratio }}">
+                            <img class=" product-image"
                               src="{{ product.featured_image | img_url }}" alt="{{ product.title }}" />
                           </figure>
                           <div class="productContentHolder">
@@ -248,16 +250,28 @@
     },
     {
     "type": "color",
+    "id": "title_color",
+    "label": "Title Color",
+    "default": "#000000"
+    },
+    {
+    "type": "color",
+    "id": "price_color",
+    "label": "Price Color",
+    "default": "#000000"
+    },
+    {
+    "type": "color",
     "id": "button_color",
     "label": "Button Color",
-    "default": "#f69191"
+    "default": "#000000"
     },
     {
     "type": "range",
     "id": "button_width",
     "label": "Button Width",
     "min": 100,
-    "max": 250,
+    "max": 240,
     "step": 10,
     "default": 200
     },

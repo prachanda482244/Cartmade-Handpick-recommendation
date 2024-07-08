@@ -1,9 +1,9 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "0d1dcb26685ef05f497a362e3d6aefe3"
-name = "cartmade-handpickup"
-handle = "cartmade-handpickup"
-application_url = "https://tumor-nj-spaces-pix.trycloudflare.com"
+client_id = "a69bed013caa901b194eee84743dd670"
+name = "cartmade-handpick-up-recommend"
+handle = "cartmade-handpickup-1"
+application_url = "https://gardens-passengers-gp-earn.trycloudflare.com"
 embedded = true
 
 [build]
@@ -11,15 +11,18 @@ automatically_update_urls_on_dev = true
 dev_store_url = "prachanda-test.myshopify.com"
 include_config_on_deploy = true
 
+[access.admin]
+direct_api_mode = "online"
+
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://tumor-nj-spaces-pix.trycloudflare.com/auth/callback",
-  "https://tumor-nj-spaces-pix.trycloudflare.com/auth/shopify/callback",
-  "https://tumor-nj-spaces-pix.trycloudflare.com/api/auth/callback"
+  "https://gardens-passengers-gp-earn.trycloudflare.com/auth/callback",
+  "https://gardens-passengers-gp-earn.trycloudflare.com/auth/shopify/callback",
+  "https://gardens-passengers-gp-earn.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

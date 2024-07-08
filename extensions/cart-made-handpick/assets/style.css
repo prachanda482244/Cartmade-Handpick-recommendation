@@ -56,7 +56,7 @@ figure {
 }
 .hprWrapper .hprCardWrapper .hprCardInner .hprpriceWrapper .hprproductPrice {
   font-size: 18px;
-  color: red;
+  color: var(--hprPriceColor);
 }
 .hprWrapper .hprCardWrapper .hprCardInner .hprpriceWrapper .hprcomparedAtPrice {
   color: grey;
@@ -72,7 +72,7 @@ figure {
 .hprWrapper .hprCardWrapper .hprCardInner .hprvendorName {
   font-size: 14px;
   font-weight: 500;
-  color: #f69191;
+  color: var(--hprTitleColor);
 }
 .hprWrapper .hprCardWrapper .hprCardInner h5 {
   font-size: 18px;
@@ -86,14 +86,14 @@ figure {
 .hprWrapper .addToCartHolder .hpratcBtn {
   font-size: 18px;
   padding: 6px 17px;
-  background-color: var(--hprprimaryColor);
-  border: 2px var(--hprprimaryColor) solid;
+  background-color: var(--hprButtonColor);
+  border: 2px var(--hprButtonColor) solid;
   color: white;
   margin: 4px 15px;
   cursor: pointer;
   border-radius: 4px;
   margin-bottom: 15px;
-  width: var(--hprprimaryWidth);
+  width: var(--hprPrimaryWidth);
 }
 .hprWrapper .addToCartHolder .hpratcBtn:hover {
   background-color: #fff;
@@ -156,13 +156,13 @@ figure {
   grid-template-columns: auto auto auto auto auto auto;
   gap: 20px;
 }
-.img-sqaure {
+.figure-sqaure {
   aspect-ratio: 1/1;
 }
-.img-adapt_to_image {
+.figure-adapt_to_image {
   aspect-ratio: 1/2;
 }
-.img-portrait {
+.figure-portrait {
   aspect-ratio: 2/3;
 }
 

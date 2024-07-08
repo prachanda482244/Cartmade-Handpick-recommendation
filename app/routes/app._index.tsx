@@ -99,6 +99,7 @@ const Dashboard = () => {
   const { pageInfo, edges } = loaderData;
   const [inputValue, setInputValue] = useState<string>("");
 
+
   useEffect(() => {
     setProducts(edges);
     setPageInformation(pageInfo);
