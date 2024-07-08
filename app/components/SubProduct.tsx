@@ -69,7 +69,10 @@ const SubProduct = ({
     });
   };
 
-  const handleClick = async () => {
+  const handleClick = async (
+    metaFieldNameSpace: string,
+    metaFieldKey: string,
+  ) => {
     const deletedIds = allSubProductId.filter(
       (item) => !subproductId.includes(item),
     );
@@ -81,7 +84,7 @@ const SubProduct = ({
     const parts: any = mainId?.split("/");
     const productId = parseInt(parts[parts?.length - 1]);
     const response = await fetch(
-      `/api/metafield?${queryString}&mainProductId=${productId}`,
+      `/api/metafield?${queryString}&mainProductId=${productId}&metaFieldNameSpace=${metaFieldNameSpace}&metaFieldKey=${metaFieldKey}`,
     );
 
     const data = await response.json();
@@ -121,7 +124,10 @@ const SubProduct = ({
 
   // End test function
 
-  const handleAddRelatedProduct = async () => {
+  const handleAddRelatedProduct = async (
+    metaFieldNameSpace: string,
+    metaFieldKey: string,
+  ) => {
     try {
       const selected = await shopify.resourcePicker({
         type: "product",
@@ -142,10 +148,11 @@ const SubProduct = ({
       const parts: any = mainId?.split("/");
       const productId = parseInt(parts[parts?.length - 1]);
       const response = await fetch(
-        `/api/metafield?${queryString}&mainProductId=${productId}`,
+        `/api/metafield?${queryString}&mainProductId=${productId}&metaFieldNameSpace=${metaFieldNameSpace}&metaFieldKey=${metaFieldKey}`,
       );
 
       const { data } = await response.json();
+      // if (data.key === "outfits") return;
       fetchData(
         "gid://shopify/Product/" + data.id,
         "gid://shopify/Product/" + data.product_id,
@@ -158,7 +165,10 @@ const SubProduct = ({
     }
   };
 
-  const handleEditRelatedProduct = async () => {
+  const handleEditRelatedProduct = async (
+    metaFieldNameSpace: string,
+    metaFieldKey: string,
+  ) => {
     const arrayId = subProducts.map((product: any) => {
       return {
         id: product.id,
@@ -190,7 +200,7 @@ const SubProduct = ({
       const parts: any = mainId?.split("/");
       const productId = parseInt(parts[parts?.length - 1]);
       const response = await fetch(
-        `/api/metafield?${queryString}&mainProductId=${productId}`,
+        `/api/metafield?${queryString}&mainProductId=${productId}&metaFieldNameSpace=${metaFieldNameSpace}&metaFieldKey=${metaFieldKey}`,
       );
 
       const data = await response.json();
@@ -234,7 +244,7 @@ const SubProduct = ({
             <div className="flex items-center gap-2 ">
               {subproductId.length !== 0 && (
                 <button
-                  onClick={handleClick}
+                  onClick={() => handleClick("custom", "recommended_produccts")}
                   className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter Polaris-Button--toneCritical"
                 >
                   Delete
@@ -242,47 +252,58 @@ const SubProduct = ({
               )}
             </div>
           </div>
-          <div className="flex justify-between  items-center border-b w-full px-2 py-4">
-            <p className=" font-semibold text-sm  w-[40%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
-              {subproductId.length !== 0 ? (
-                <div
-                  onClick={() => {
-                    setSubProductId(
-                      subproductId.length !== initialIds.length
-                        ? initialIds
-                        : [],
-                    );
-                  }}
-                  className="flex items-center gap-2 relative font-semibold"
-                >
-                  <Checkbox
-                    label
-                    labelHidden
-                    checked={subproductId.length === initialIds.length}
-                  />
-                  {subproductId.length !== initialIds.length && (
-                    <div className="absolute -left-[1px] ">
-                      <Icon source={MinusIcon} tone="base" />
-                    </div>
-                  )}
-                  <label className="cursor-pointer">
-                    {subproductId.length + " selected"}
-                  </label>
-                </div>
-              ) : (
-                "Product title"
-              )}
-            </p>
+          <div className="flex   border-b w-full px-2 py-4">
+            <div className="flex items-center justify-around w-1/2 border">
+              <p className=" font-semibold text-sm    px-4 text-left leading-4 text-gray-700 tracking-wider">
+                {subproductId.length !== 0 ? (
+                  <div
+                    onClick={() => {
+                      setSubProductId(
+                        subproductId.length !== initialIds.length
+                          ? initialIds
+                          : [],
+                      );
+                    }}
+                    className="flex items-center gap-2 relative font-semibold"
+                  >
+                    <Checkbox
+                      label
+                      labelHidden
+                      checked={subproductId.length === initialIds.length}
+                    />
+                    {subproductId.length !== initialIds.length && (
+                      <div className="absolute -left-[1px] ">
+                        <Icon source={MinusIcon} tone="base" />
+                      </div>
+                    )}
+                    <label className="cursor-pointer">
+                      {subproductId.length + " selected"}
+                    </label>
+                  </div>
+                ) : (
+                  "Product title"
+                )}
+              </p>
 
-            <p className=" font-semibold text-sm px-4 text-left leading-4 text-gray-700 tracking-wider">
-              Inventory
-            </p>
-            <p className=" font-semibold text-sm w-[15%]  px-4text-left leading-4 text-gray-700 tracking-wider">
-              Price
-            </p>
-            <p className=" font-semibold text-sm w-[20%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
-              Vendor
-            </p>
+              <p className=" font-semibold text-sm px-4 text-left leading-4 text-gray-700 tracking-wider">
+                Inventory
+              </p>
+              <p className=" font-semibold text-sm  px-4text-left leading-4 text-gray-700 tracking-wider">
+                Price
+              </p>
+            </div>
+            <div className="border w-1/2">
+              Add Complete outfit
+              <button
+                onClick={() => handleAddRelatedProduct("custom", "outfits")}
+                className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
+              >
+                Add related outfit
+              </button>
+              <p className=" font-semibold text-sm w-[20%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
+                Vendor
+              </p>
+            </div>
           </div>
         </div>
         {subProducts &&
@@ -308,51 +329,62 @@ const SubProduct = ({
               onDrop={handleDrop}
               dragConstraints={{ top: 0, bottom: 0 }}
             >
-              <div className="flex justify-between items-center w-full">
-                <div className="flex items-center  w-[40%] px-2">
-                  <motion.div
-                    className="cursor-pointer  px-2 py-1"
-                    draggable={true}
-                    onDragStart={(event: any) => handleDragStart(event, index)}
-                    onDragOver={(event) => handleDragOver(event, index)}
-                    onDrop={handleDrop}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <MdDragIndicator className="w-5 h-5" />
-                  </motion.div>
-                  <div>
-                    <p className="py-2 px-4 font-medium  flex items-center gap-4">
-                      <span className="border w-10 flex  items-center justify-center h-10 rounded-lg ">
-                        {product.featuredImage === null ? (
-                          <DefaultGallery />
-                        ) : (
-                          <img
-                            src={product.featuredImage.url}
-                            alt="product"
-                            className="w-8 h-8"
-                          />
-                        )}
-                      </span>
-                      <span className="">{product?.title}</span>
-                    </p>
+              <div className="flex justify-between w-full">
+                <div className="flex justify-around w-1/2 items-center">
+                  <div className="flex items-center w-[20%]  px-2">
+                    <motion.div
+                      className="cursor-pointer  px-2 py-1"
+                      draggable={true}
+                      onDragStart={(event: any) =>
+                        handleDragStart(event, index)
+                      }
+                      onDragOver={(event) => handleDragOver(event, index)}
+                      onDrop={handleDrop}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <MdDragIndicator className="w-5 h-5" />
+                    </motion.div>
+                    <div>
+                      <p className="py-2 px-4 font-medium  flex items-center gap-4">
+                        <span className="border w-10 flex  items-center justify-center h-10 rounded-lg ">
+                          {product.featuredImage === null ? (
+                            <DefaultGallery />
+                          ) : (
+                            <img
+                              src={product.featuredImage.url}
+                              alt="product"
+                              className="w-8 h-8"
+                            />
+                          )}
+                        </span>
+                        <span className="">{product?.title}</span>
+                      </p>
+                    </div>
                   </div>
+
+                  <p className="py-2 px-4  text-red-600">
+                    {product.totalInventory}
+                  </p>
+                  <p className="py-2 px-4 w-[14%] ">
+                    £ {product.priceRange?.minVariantPrice?.amount}
+                  </p>
                 </div>
 
-                <p className="py-2 px-4  text-red-600">
-                  {product.totalInventory}
-                </p>
-                <p className="py-2 px-4 w-[14%] ">
-                  £ {product.priceRange?.minVariantPrice?.amount}
-                </p>
-                <p className="py-2 px-4 w-[20%] capitalize">{product.vendor}</p>
+                <div>
+                  <p className="py-2 px-4 w-[20%] capitalize">
+                    {product.vendor}
+                  </p>
+                </div>
               </div>
             </motion.div>
           ))}
         <div className="flex gap-2 py-2 px-2 items-center justify-between">
           {!subProducts.length ? (
             <button
-              onClick={handleAddRelatedProduct}
+              onClick={() =>
+                handleAddRelatedProduct("custom", "recommended_produccts")
+              }
               className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
             >
               Add Product
@@ -360,7 +392,9 @@ const SubProduct = ({
           ) : (
             <>
               <button
-                onClick={handleEditRelatedProduct}
+                onClick={() =>
+                  handleEditRelatedProduct("custom", "recommended_produccts")
+                }
                 className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantSecondary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
               >
                 Edit Product

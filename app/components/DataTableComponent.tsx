@@ -71,7 +71,6 @@ const DataTableComponent = ({
     }
   };
 
-
   const rows = products?.map((product, index) => {
     const {
       id,

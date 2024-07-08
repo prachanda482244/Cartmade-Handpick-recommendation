@@ -12,6 +12,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const metafield = new admin.rest.resources.Metafield({ session: session });
   const url = new URL(request.url);
   const mainProductId: any = url.searchParams.get("mainProductId");
+  const metaFieldNameSpace: any = url.searchParams.get("metaFieldNameSpace");
+  const metaFieldKey: any = url.searchParams.get("metaFieldKey");
   const productIds = [];
   for (let i = 0; url.searchParams.has(`productIds[${i}]`); i++) {
     const id = url.searchParams.get(`productIds[${i}]`);
@@ -21,15 +23,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
       console.error(`Product at index ${i} is missing id`);
     }
   }
-  console.log(productIds, "product ids");
-  console.log(typeof productIds);
   const mainId = parseInt(mainProductId);
 
   const gidJsonString = JSON.stringify(productIds);
-  console.log(gidJsonString, "string json ");
   metafield.product_id = mainId;
-  metafield.namespace = "custom";
-  metafield.key = "recommended_produccts";
+  // metafield.namespace = "custom";
+  metafield.namespace = metaFieldNameSpace;
+  // metafield.key = "recommended_produccts";
+  metafield.key = metaFieldKey;
   metafield.value = gidJsonString;
 
   metafield.type = "list.product_reference";
