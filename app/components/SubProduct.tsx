@@ -3,8 +3,9 @@ import { MinusIcon } from "@shopify/polaris-icons";
 import { MdDragIndicator } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { subProducts } from "~/config/typeConfig";
-import { DefaultGallery } from "~/config/svgItem";
+import { DefaultGallery, NoProductFound } from "~/config/svgItem";
 import { Checkbox, Icon } from "@shopify/polaris";
+import { FiLoader } from "react-icons/fi";
 
 const SubProduct = ({
   title,
@@ -110,7 +111,6 @@ const SubProduct = ({
       });
     }
   };
-
   const handleAddRelatedProduct = async () => {
     try {
       const selected = await shopify.resourcePicker({
@@ -254,12 +254,13 @@ const SubProduct = ({
       });
     }
   };
+
   return (
-    <div className=" flex border w-full border-blue-400 overflow-hidden rounded-lg flex-col">
+    <div className=" flex border w-full hover:border-gray-400 transition-all delay-[10]  overflow-hidden rounded-lg flex-col">
       <AnimatePresence>
         <div className="  flex flex-col items-center">
-          <div className="flex justify-between bg-[#f1f1f1] items-center border-b p-2  w-full">
-            <h3 className="font-semibold p-1 text-lg tracking-tight  ">
+          <div className="flex justify-between bg-[#f1f1f1] items-center border-b px-3 py-2  w-full">
+            <h3 className="font-semibold capitalize  text-lg tracking-tight  ">
               {title}
             </h3>
             <div className="flex items-center gap-2 ">
@@ -271,46 +272,67 @@ const SubProduct = ({
                   Delete
                 </button>
               )}
-            </div>
-          </div>
-          <div className="flex   border-b w-full px-2 py-4">
-            <div className="flex items-center justifybetween w-full">
-              <p className=" font-semibold text-sm  w-[80%] pl-1 text-left leading-4 text-gray-700 tracking-wider">
-                {subproductId.length !== 0 ? (
-                  <div
-                    onClick={() => {
-                      setSubProductId(
-                        subproductId.length !== initialIds.length
-                          ? initialIds
-                          : [],
-                      );
-                    }}
-                    className="flex items-center gap-2 relative font-semibold"
-                  >
-                    <Checkbox
-                      label
-                      labelHidden
-                      checked={subproductId.length === initialIds.length}
-                    />
-                    {subproductId.length !== initialIds.length && (
-                      <div className="absolute -left-[1px] ">
-                        <Icon source={MinusIcon} tone="base" />
-                      </div>
-                    )}
-                    <label className="cursor-pointer">
-                      {subproductId.length + " selected"}
-                    </label>
-                  </div>
-                ) : (
-                  "Product"
-                )}
-              </p>
 
-              <p className=" font-semibold text-center text-sm px-4  w-[20%]  leading-4 text-gray-700 tracking-wider">
-                Inventory
-              </p>
+              {subProducts.length ? (
+                <>
+                  <button
+                    onClick={handleEditRelatedProduct}
+                    className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantSecondary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
+                  >
+                    Edit Product
+                  </button>
+                  {condition && (
+                    <button
+                      onClick={handleSaveChanges}
+                      className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
+                    >
+                      Save changes
+                    </button>
+                  )}
+                </>
+              ) : null}
             </div>
           </div>
+          {subProducts.length !== 0 && (
+            <div className="flex   border-b w-full px-2 py-4">
+              <div className="flex items-center justifybetween w-full">
+                <p className=" font-semibold text-sm  w-[80%] pl-1 text-left leading-4 text-gray-700 tracking-wider">
+                  {subproductId.length !== 0 ? (
+                    <div
+                      onClick={() => {
+                        setSubProductId(
+                          subproductId.length !== initialIds.length
+                            ? initialIds
+                            : [],
+                        );
+                      }}
+                      className="flex items-center gap-2 relative font-semibold"
+                    >
+                      <Checkbox
+                        label
+                        labelHidden
+                        checked={subproductId.length === initialIds.length}
+                      />
+                      {subproductId.length !== initialIds.length && (
+                        <div className="absolute -left-[1px] ">
+                          <Icon source={MinusIcon} tone="base" />
+                        </div>
+                      )}
+                      <label className="cursor-pointer">
+                        {subproductId.length + " selected"}
+                      </label>
+                    </div>
+                  ) : (
+                    "Product"
+                  )}
+                </p>
+
+                <p className=" font-semibold text-center text-sm px-4  w-[20%]  leading-4 text-gray-700 tracking-wider">
+                  Inventory
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {subProducts &&
@@ -383,33 +405,21 @@ const SubProduct = ({
               </div>
             </motion.div>
           ))}
-        <div className="flex gap-2 py-2 px-2 items-center justify-between">
-          {!subProducts.length ? (
+        {subProducts.length === 0 && (
+          <div className="flex flex-col items-center justify-center pb-3 h-full">
+            <NoProductFound width="130" height="130" />
+            <h4 className="font-bold text-sm">Add your {title}</h4>
+            <p className=" text-gray-500 mb-5">
+              Start by stocking your store with products your customer will love
+            </p>
             <button
               onClick={handleAddRelatedProduct}
               className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
             >
               Add Product
             </button>
-          ) : (
-            <>
-              <button
-                onClick={handleEditRelatedProduct}
-                className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantSecondary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
-              >
-                Edit Product
-              </button>
-              {condition && (
-                <button
-                  onClick={handleSaveChanges}
-                  className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
-                >
-                  Save changes
-                </button>
-              )}
-            </>
-          )}
-        </div>
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );

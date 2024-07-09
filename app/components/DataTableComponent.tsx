@@ -51,66 +51,125 @@ const DataTableComponent = ({
   }) => {
     setProductId(productId);
     setIsProductLoading(true);
+
+    // if (combineProductMetaId === undefined) {
+    //   setCombineProduct([]);
+    //   setOriginalCombineProduct([]);
+    // }
+    // if (outfitProductMetaId === undefined) {
+    //   setOutfitsProduct([]);
+    //   setOriginalOutfitProduct([]);
+    // }
+    // if (recommededProductMetaId === undefined) {
+    //   setSubProducts([]);
+    //   setOriginalProduct([]);
+    // }
+
+    let obj = [];
+    if (recommededProductMetaId !== undefined) {
+      obj.push({
+        key: "recommended",
+        url: `/api/fetchmetafield?productId=${productId}&metaFieldId=${recommededProductMetaId}`,
+      });
+    }
+
+    if (outfitProductMetaId !== undefined) {
+      obj.push({
+        key: "outfits",
+        url: `/api/fetchmetafield?productId=${productId}&metaFieldId=${outfitProductMetaId}`,
+      });
+    }
+    if (combineProductMetaId !== undefined) {
+      obj.push({
+        key: "combined",
+        url: `/api/fetchmetafield?productId=${productId}&metaFieldId=${combineProductMetaId}`,
+      });
+    }
+
     try {
-      if (recommededProductMetaId !== undefined) {
-        const recommededProduct = await fetch(
-          `/api/fetchmetafield?productId=${productId}&metaFieldId=${recommededProductMetaId}`,
-        );
-        if (recommededProduct.ok) {
-          setIsProductLoading(false);
-          const { data } = await recommededProduct.json();
-          setSubProducts(data);
-          setOriginalProduct(data);
-        } else {
-          setIsProductLoading(false);
+      const promises = obj.map((item) => fetch(item.url));
+      const responses = await Promise.all(promises);
+      const data = await Promise.all(responses.map((res) => res.json()));
+      setIsProductLoading(false);
 
-          console.error(
-            "Failed to fetch metafield data:",
-            recommededProduct.statusText,
-          );
+      data.forEach((result, index) => {
+        const { key } = obj[index];
+        const items = result.data.length ? result.data : [];
+        console.log(items);
+        if (key === "recommended") {
+          setSubProducts(items);
+          setOriginalProduct(items);
+        } else if (key === "outfits") {
+          setOutfitsProduct(items);
+          setOriginalOutfitProduct(items);
+        } else if (key === "combined") {
+          setCombineProduct(items);
+          setOriginalCombineProduct(items);
         }
-      }
-      if (outfitProductMetaId !== undefined) {
-        const outfitProduct = await fetch(
-          `/api/fetchmetafield?productId=${productId}&metaFieldId=${outfitProductMetaId}`,
-        );
-
-        if (outfitProduct.ok) {
-          setIsProductLoading(false);
-          const { data } = await outfitProduct.json();
-          setOutfitsProduct(data);
-          setOriginalOutfitProduct(data);
-        } else {
-          setIsProductLoading(false);
-
-          console.error(
-            "Failed to fetch metafield data:",
-            outfitProduct.statusText,
-          );
-        }
-      }
-      if (combineProductMetaId !== undefined) {
-        const combineProduct = await fetch(
-          `/api/fetchmetafield?productId=${productId}&metaFieldId=${combineProductMetaId}`,
-        );
-        if (combineProduct.ok) {
-          setIsProductLoading(false);
-          const { data } = await combineProduct.json();
-          setCombineProduct(data);
-          setOriginalCombineProduct(data);
-        } else {
-          setIsProductLoading(false);
-          console.log("Hello from else");
-          console.error(
-            "Failed to fetch metafield data:",
-            combineProduct.statusText,
-          );
-        }
-      }
+      });
     } catch (error) {
       console.error("Error fetching metafield data:", error);
       setIsProductLoading(false);
     }
+
+    // try {
+    //   if (recommededProductMetaId !== undefined) {
+    //     const recommededProduct = await fetch(
+    //       `/api/fetchmetafield?productId=${productId}&metaFieldId=${recommededProductMetaId}`,
+    //     );
+    //     if (recommededProduct.ok) {
+    //       setIsProductLoading(false);
+    //       const { data } = await recommededProduct.json();
+    //       setSubProducts(data);
+    //       setOriginalProduct(data);
+    //     } else {
+    //       setIsProductLoading(false);
+    //       console.error(
+    //         "Failed to fetch metafield data:",
+    //         recommededProduct.statusText,
+    //       );
+    //     }
+    //   }
+    //   if (outfitProductMetaId !== undefined) {
+    //     const outfitProduct = await fetch(
+    //       `/api/fetchmetafield?productId=${productId}&metaFieldId=${outfitProductMetaId}`,
+    //     );
+
+    //     if (outfitProduct.ok) {
+    //       setIsProductLoading(false);
+    //       const { data } = await outfitProduct.json();
+    //       setOutfitsProduct(data);
+    //       setOriginalOutfitProduct(data);
+    //     } else {
+    //       setIsProductLoading(false);
+
+    //       console.error(
+    //         "Failed to fetch metafield data:",
+    //         outfitProduct.statusText,
+    //       );
+    //     }
+    //   }
+    //   if (combineProductMetaId !== undefined) {
+    //     const combineProduct = await fetch(
+    //       `/api/fetchmetafield?productId=${productId}&metaFieldId=${combineProductMetaId}`,
+    //     );
+    //     if (combineProduct.ok) {
+    //       setIsProductLoading(false);
+    //       const { data } = await combineProduct.json();
+    //       setCombineProduct(data);
+    //       setOriginalCombineProduct(data);
+    //     } else {
+    //       setIsProductLoading(false);
+    //       console.error(
+    //         "Failed to fetch metafield data:",
+    //         combineProduct.statusText,
+    //       );
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error("Error fetching metafield data:", error);
+    //   setIsProductLoading(false);
+    // }
   };
   useEffect(() => {
     fetchData({
@@ -139,8 +198,6 @@ const DataTableComponent = ({
           };
         }) => node.id.split("/")[node.id.split("/").length - 1],
       );
-      console.log(metafieldId);
-      console.log(metaIds);
       setRecommendedMetaId(metaIds[0]);
       setOutFitMetaId(metaIds[1]);
       setCombinedMetaId(metaIds[2]);
@@ -220,7 +277,7 @@ const DataTableComponent = ({
           ) : (
             <div className=" flex border   gap-5 p-5">
               <SubProduct
-                title="Recommended Products"
+                title="recommended product"
                 subProducts={subProducts}
                 setSubProducts={setSubProducts}
                 fetchData={fetchData}
@@ -231,7 +288,7 @@ const DataTableComponent = ({
               />
 
               <SubProduct
-                title="Outfit product"
+                title="outfit product"
                 subProducts={outfitsProduct}
                 setSubProducts={setOutfitsProduct}
                 fetchData={fetchData}
@@ -242,7 +299,7 @@ const DataTableComponent = ({
               />
 
               <SubProduct
-                title="Combine with product"
+                title="combine product"
                 subProducts={combineProduct}
                 setSubProducts={setCombineProduct}
                 fetchData={fetchData}
