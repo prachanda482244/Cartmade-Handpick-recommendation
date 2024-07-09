@@ -8,17 +8,23 @@ import { Checkbox, Icon } from "@shopify/polaris";
 import axios from "axios";
 
 const SubProduct = ({
+  title,
   subProducts,
   setSubProducts,
-  mainId,
-  originalProduct,
   fetchData,
+  originalProduct,
+  mainId,
+  metaFieldKey,
+  metaFieldNameSpace,
 }: {
+  title: string;
   subProducts: subProducts[];
   setSubProducts: any;
   mainId: string;
   originalProduct: subProducts[];
   fetchData: any;
+  metaFieldKey: string;
+  metaFieldNameSpace: string;
 }) => {
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [subproductId, setSubProductId] = useState<string[]>([]);
@@ -27,6 +33,8 @@ const SubProduct = ({
   const [updatedProductIds, setUpdatedProductIds] = useState<string[]>([]);
 
   const initialIds = originalProduct?.map(({ id }) => id);
+  console.log(initialIds, "Product initial ids");
+  console.log(allSubProductId, "sub product ids");
 
   const handleDragStart = (event: React.DragEvent, index: number) => {
     setDraggingIndex(index);
@@ -69,10 +77,7 @@ const SubProduct = ({
     });
   };
 
-  const handleClick = async (
-    metaFieldNameSpace: string,
-    metaFieldKey: string,
-  ) => {
+  const handleClick = async () => {
     const deletedIds = allSubProductId.filter(
       (item) => !subproductId.includes(item),
     );
@@ -87,47 +92,14 @@ const SubProduct = ({
       `/api/metafield?${queryString}&mainProductId=${productId}&metaFieldNameSpace=${metaFieldNameSpace}&metaFieldKey=${metaFieldKey}`,
     );
 
-    const data = await response.json();
-    fetchData(
-      "gid://shopify/Product/" + data.data.id,
-      "gid://shopify/Product/" + data.data.product_id,
-    );
+    const { data } = await response.json();
+    fetchData({
+      productId: data.product_id,
+      recommededProductMetaId: data.id,
+    });
   };
 
-  // Testing
-  // const handleClick = async () => {
-  //   const parts: any = mainId?.split("/");
-  //   const productId = parseInt(parts[parts?.length - 1]);
-
-  //   const deletedIds = allSubProductId.filter(
-  //     (item) => !subproductId.includes(item),
-  //   );
-  //   // Serialize the product IDs into a query string format
-  //   console.log(deletedIds, "Deleted ids");
-  //   console.log(productId, "product id");
-
-  //   const { data } = await axios.post("/api/test", {
-  //     mainProductId: productId,
-  //     productIds: deletedIds,
-  //   });
-  //   console.log(data);
-  //   // const response = await fetch(
-  //   //   `/api/metafield?${queryString}&mainProductId=${productId}`,
-  //   // );
-
-  //   // const data = await response.json();
-  //   // fetchData(
-  //   //   "gid://shopify/Product/" + data.data.id,
-  //   //   "gid://shopify/Product/" + data.data.product_id,
-  //   // );
-  // };
-
-  // End test function
-
-  const handleAddRelatedProduct = async (
-    metaFieldNameSpace: string,
-    metaFieldKey: string,
-  ) => {
+  const handleAddRelatedProduct = async () => {
     try {
       const selected = await shopify.resourcePicker({
         type: "product",
@@ -152,11 +124,10 @@ const SubProduct = ({
       );
 
       const { data } = await response.json();
-      // if (data.key === "outfits") return;
-      fetchData(
-        "gid://shopify/Product/" + data.id,
-        "gid://shopify/Product/" + data.product_id,
-      );
+      fetchData({
+        productId: data.product_id,
+        recommededProductMetaId: data.id,
+      });
     } catch (error) {
       console.error(
         "Error selecting products or fetching metafield data:",
@@ -165,10 +136,9 @@ const SubProduct = ({
     }
   };
 
-  const handleEditRelatedProduct = async (
-    metaFieldNameSpace: string,
-    metaFieldKey: string,
-  ) => {
+  const handleEditRelatedProduct = async () => {
+    console.log(title);
+    console.log(metaFieldKey);
     const arrayId = subProducts.map((product: any) => {
       return {
         id: product.id,
@@ -188,8 +158,6 @@ const SubProduct = ({
         },
       });
 
-      // Take the id from the selected array
-
       if (selected === undefined) return;
       const productIds = selected?.map(({ id }) => id);
 
@@ -203,11 +171,11 @@ const SubProduct = ({
         `/api/metafield?${queryString}&mainProductId=${productId}&metaFieldNameSpace=${metaFieldNameSpace}&metaFieldKey=${metaFieldKey}`,
       );
 
-      const data = await response.json();
-      fetchData(
-        "gid://shopify/Product/" + data.data.id,
-        "gid://shopify/Product/" + data.data.product_id,
-      );
+      const { data } = await response.json();
+      fetchData({
+        productId: data.product_id,
+        recommededProductMetaId: data.id,
+      });
     } catch (error) {
       console.error(
         "Error selecting products or fetching metafield data:",
@@ -220,31 +188,31 @@ const SubProduct = ({
     const queryString = updatedProductIds
       ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
       .join("&");
-
+    console.log("Save changes");
     const parts: any = mainId?.split("/");
     const productId = parseInt(parts[parts?.length - 1]);
     const response = await fetch(
-      `/api/metafield?${queryString}&mainProductId=${productId}`,
+      `/api/metafield?${queryString}&mainProductId=${productId}&metaFieldNameSpace=${metaFieldNameSpace}&metaFieldKey=${metaFieldKey}`,
     );
 
-    const data = await response.json();
-    fetchData(
-      "gid://shopify/Product/" + data.data.id,
-      "gid://shopify/Product/" + data.data.product_id,
-    );
+    const { data } = await response.json();
+    fetchData({
+      productId: data.product_id,
+      recommededProductMetaId: data.id,
+    });
   };
   return (
-    <div className=" flex border rounded-lg flex-col">
+    <div className=" flex border w-full border-blue-400 rounded-lg flex-col">
       <AnimatePresence>
         <div className=" flex flex-col items-center">
           <div className="flex justify-between items-center border-b p-1  w-full">
-            <h1 className="font-semibold px-2 text-lg tracking-tight  ">
-              Recommended Products
+            <h1 className="font-semibold px-2 py-1 text-lg tracking-tight  ">
+              {title}
             </h1>
             <div className="flex items-center gap-2 ">
               {subproductId.length !== 0 && (
                 <button
-                  onClick={() => handleClick("custom", "recommended_produccts")}
+                  onClick={handleClick}
                   className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter Polaris-Button--toneCritical"
                 >
                   Delete
@@ -253,8 +221,8 @@ const SubProduct = ({
             </div>
           </div>
           <div className="flex   border-b w-full px-2 py-4">
-            <div className="flex items-center justify-around w-1/2 border">
-              <p className=" font-semibold text-sm    px-4 text-left leading-4 text-gray-700 tracking-wider">
+            <div className="flex items-center justify-between w-full">
+              <p className=" font-semibold text-sm   w-[35%] px-4 text-left leading-4 text-gray-700 tracking-wider">
                 {subproductId.length !== 0 ? (
                   <div
                     onClick={() => {
@@ -291,21 +259,14 @@ const SubProduct = ({
               <p className=" font-semibold text-sm  px-4text-left leading-4 text-gray-700 tracking-wider">
                 Price
               </p>
-            </div>
-            <div className="border w-1/2">
-              Add Complete outfit
-              <button
-                onClick={() => handleAddRelatedProduct("custom", "outfits")}
-                className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
-              >
-                Add related outfit
-              </button>
+
               <p className=" font-semibold text-sm w-[20%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
                 Vendor
               </p>
             </div>
           </div>
         </div>
+
         {subProducts &&
           subProducts?.map((product: any, index: number) => (
             <motion.div
@@ -330,8 +291,8 @@ const SubProduct = ({
               dragConstraints={{ top: 0, bottom: 0 }}
             >
               <div className="flex justify-between w-full">
-                <div className="flex justify-around w-1/2 items-center">
-                  <div className="flex items-center w-[20%]  px-2">
+                <div className="flex  justify-between w-full items-center">
+                  <div className="flex items-center  w-2/5  px-2">
                     <motion.div
                       className="cursor-pointer  px-2 py-1"
                       draggable={true}
@@ -346,7 +307,7 @@ const SubProduct = ({
                       <MdDragIndicator className="w-5 h-5" />
                     </motion.div>
                     <div>
-                      <p className="py-2 px-4 font-medium  flex items-center gap-4">
+                      <p className="py-2 px-4 font-medium flex items-center gap-4">
                         <span className="border w-10 flex  items-center justify-center h-10 rounded-lg ">
                           {product.featuredImage === null ? (
                             <DefaultGallery />
@@ -369,9 +330,6 @@ const SubProduct = ({
                   <p className="py-2 px-4 w-[14%] ">
                     £ {product.priceRange?.minVariantPrice?.amount}
                   </p>
-                </div>
-
-                <div>
                   <p className="py-2 px-4 w-[20%] capitalize">
                     {product.vendor}
                   </p>
@@ -382,9 +340,7 @@ const SubProduct = ({
         <div className="flex gap-2 py-2 px-2 items-center justify-between">
           {!subProducts.length ? (
             <button
-              onClick={() =>
-                handleAddRelatedProduct("custom", "recommended_produccts")
-              }
+              onClick={handleAddRelatedProduct}
               className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
             >
               Add Product
@@ -392,9 +348,7 @@ const SubProduct = ({
           ) : (
             <>
               <button
-                onClick={() =>
-                  handleEditRelatedProduct("custom", "recommended_produccts")
-                }
+                onClick={handleEditRelatedProduct}
                 className="Polaris-Button Polaris-Button--pressable Polaris-Button--variantSecondary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter"
               >
                 Edit Product

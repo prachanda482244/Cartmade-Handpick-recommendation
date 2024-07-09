@@ -20,54 +20,100 @@ const DataTableComponent = ({
 }) => {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [subProducts, setSubProducts] = useState<subProducts[]>([]);
+  const [outfitsProduct, setOutfitsProduct] = useState<subProducts[]>([]);
   const [originalProduct, setOriginalProduct] = useState<subProducts[]>([]);
+  const [originalOutfitProduct, setOriginalOutfitProduct] = useState<
+    subProducts[]
+  >([]);
   const [isProductLoading, setIsProductLoading] = useState<boolean>(true);
   const [activeId, setActiveId] = useState<string>("");
+  const [product_Id, setProductId] = useState<string | number>("");
 
-  const [metafield_Id, setMetafieldId] = useState<string>("");
-  const [product_Id, setProductId] = useState<string>("");
-
-  const fetchData = async (metafieldId: string, productId: string) => {
-    setMetafieldId(metafieldId);
+  const fetchData = async ({
+    productId,
+    recommededProductMetaId,
+    outfitProductMetaId,
+  }: {
+    productId: number | string;
+    recommededProductMetaId?: number | string;
+    outfitProductMetaId?: number | string;
+  }) => {
+    console.log(productId, "product id fetch data");
     setProductId(productId);
-    const metaIdParts = metafieldId.split("/");
-    const metaId = metaIdParts[metaIdParts.length - 1];
-
-    const productParts = productId.split("/");
-    const product_id = productParts[productParts.length - 1];
     setIsProductLoading(true);
     try {
-      const response = await fetch(
-        `/api/fetchmetafield?productId=${product_id}&metaFieldId=${metaId}`,
-      );
+      if (recommededProductMetaId) {
+        const recommededProduct = await fetch(
+          `/api/fetchmetafield?productId=${productId}&metaFieldId=${recommededProductMetaId}`,
+        );
+        if (recommededProduct.ok) {
+          setIsProductLoading(false);
+          const { data } = await recommededProduct.json();
+          setSubProducts(data);
+          setOriginalProduct(data);
+        } else {
+          setIsProductLoading(false);
 
-      if (response.ok) {
-        setIsProductLoading(false);
-        const { data } = await response.json();
-        setSubProducts(data);
-        setOriginalProduct(data);
-      } else {
-        setIsProductLoading(false);
+          console.error(
+            "Failed to fetch metafield data:",
+            recommededProduct.statusText,
+          );
+        }
+      }
 
-        console.error("Failed to fetch metafield data:", response.statusText);
+      if (outfitProductMetaId) {
+        const outfitProduct = await fetch(
+          `/api/fetchmetafield?productId=${productId}&metaFieldId=${outfitProductMetaId}`,
+        );
+
+        if (outfitProduct.ok) {
+          setIsProductLoading(false);
+          const { data } = await outfitProduct.json();
+          setOutfitsProduct(data);
+          setOriginalProduct(data);
+          setOriginalOutfitProduct(data);
+        } else {
+          setIsProductLoading(false);
+
+          console.error(
+            "Failed to fetch metafield data:",
+            outfitProduct.statusText,
+          );
+        }
       }
     } catch (error) {
       console.error("Error fetching metafield data:", error);
       setIsProductLoading(false);
     }
   };
-
   useEffect(() => {
-    fetchData(metafield_Id, product_Id);
-  }, [metafield_Id, product_Id]);
+    fetchData({ productId: product_Id });
+  }, [product_Id]);
 
-  const handleClick = async (productId: string, metafieldId: string | null) => {
+  const handleClick = async (
+    productId: string,
+    metafieldId: string[] | any,
+  ) => {
     setActiveId(productId);
     const isCurrentlyExpanded = expandedRow === productId;
     setExpandedRow(isCurrentlyExpanded ? null : productId);
 
     if (!isCurrentlyExpanded && metafieldId) {
-      fetchData(metafieldId, productId);
+      console.log(metafieldId);
+      const metaIds = metafieldId.map(
+        ({
+          node,
+        }: {
+          node: {
+            id: string;
+          };
+        }) => node.id.split("/")[node.id.split("/").length - 1],
+      );
+      fetchData({
+        productId,
+        recommededProductMetaId: metaIds[0],
+        outfitProductMetaId: metaIds[1],
+      });
     }
   };
 
@@ -84,9 +130,9 @@ const DataTableComponent = ({
       createdAt,
     } = product.node;
 
-    let metafieldId: string | null = null;
+    let metafieldId: any;
     if (Array.isArray(metafields?.edges) && metafields.edges.length > 0) {
-      metafieldId = metafields.edges[0]?.node?.id || null;
+      metafieldId = metafields.edges || null;
     }
 
     const isExpanded = expandedRow === id;
@@ -136,17 +182,27 @@ const DataTableComponent = ({
           (isProductLoading ? (
             <Loader />
           ) : (
-            <div className=" flex flex-col gap-2 items-center p-5">
-              <div className="w-[70%]">
-                <SubProduct
-                  subProducts={subProducts}
-                  setSubProducts={setSubProducts}
-                  fetchData={fetchData}
-                  originalProduct={originalProduct}
-                  mainId={id}
-                />
-              </div>
-              <div className="flex w-1/2 gap-5 items-center"></div>
+            <div className=" flex border   gap-5 p-5">
+              <SubProduct
+                title="Recommended Products"
+                subProducts={subProducts}
+                setSubProducts={setSubProducts}
+                fetchData={fetchData}
+                originalProduct={originalProduct}
+                mainId={id}
+                metaFieldNameSpace="custom"
+                metaFieldKey="recommended_produccts"
+              />
+              <SubProduct
+                title="Outfit product"
+                subProducts={outfitsProduct}
+                setSubProducts={setOutfitsProduct}
+                fetchData={fetchData}
+                originalProduct={originalOutfitProduct}
+                mainId={id}
+                metaFieldNameSpace="custom"
+                metaFieldKey="outfits"
+              />
             </div>
           ))}
       </>

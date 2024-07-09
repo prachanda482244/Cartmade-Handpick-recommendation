@@ -28,7 +28,7 @@ export const query = `
         id
         status
         totalInventory
-         metafields(first:1 , keys:["custom.recommended_produccts"]) { 
+         metafields(first:2 , keys:["custom.recommended_produccts","custom.outfits"]) { 
             edges {
               node {
                 id
@@ -98,7 +98,6 @@ const Dashboard = () => {
   const [products, setProducts] = useState<Products[]>([]);
   const { pageInfo, edges } = loaderData;
   const [inputValue, setInputValue] = useState<string>("");
-
 
   useEffect(() => {
     setProducts(edges);
