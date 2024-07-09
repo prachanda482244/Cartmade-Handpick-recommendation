@@ -3,7 +3,7 @@
 client_id = "a69bed013caa901b194eee84743dd670"
 name = "cartmade-handpick-up-recommend"
 handle = "cartmade-handpickup-1"
-application_url = "https://managers-drives-funk-cheats.trycloudflare.com"
+application_url = "https://glory-bw-tracked-statutory.trycloudflare.com"
 embedded = true
 
 [build]
@@ -20,9 +20,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://managers-drives-funk-cheats.trycloudflare.com/auth/callback",
-  "https://managers-drives-funk-cheats.trycloudflare.com/auth/shopify/callback",
-  "https://managers-drives-funk-cheats.trycloudflare.com/api/auth/callback"
+  "https://glory-bw-tracked-statutory.trycloudflare.com/auth/callback",
+  "https://glory-bw-tracked-statutory.trycloudflare.com/auth/shopify/callback",
+  "https://glory-bw-tracked-statutory.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

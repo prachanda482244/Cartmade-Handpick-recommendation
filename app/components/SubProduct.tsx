@@ -1,11 +1,10 @@
 import { motion, AnimatePresence, DragControls } from "framer-motion";
 import { MinusIcon } from "@shopify/polaris-icons";
 import { MdDragIndicator } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { subProducts } from "~/config/typeConfig";
 import { DefaultGallery } from "~/config/svgItem";
 import { Checkbox, Icon } from "@shopify/polaris";
-import axios from "axios";
 
 const SubProduct = ({
   title,
@@ -33,8 +32,6 @@ const SubProduct = ({
   const [updatedProductIds, setUpdatedProductIds] = useState<string[]>([]);
 
   const initialIds = originalProduct?.map(({ id }) => id);
-  console.log(initialIds, "Product initial ids");
-  console.log(allSubProductId, "sub product ids");
 
   const handleDragStart = (event: React.DragEvent, index: number) => {
     setDraggingIndex(index);
@@ -93,10 +90,25 @@ const SubProduct = ({
     );
 
     const { data } = await response.json();
-    fetchData({
-      productId: data.product_id,
-      recommededProductMetaId: data.id,
-    });
+    if (metaFieldKey === "outfits") {
+      fetchData({
+        productId: data.product_id,
+        outfitProductMetaId: data.id,
+      });
+    }
+    if (metaFieldKey === "combine_products") {
+      fetchData({
+        productId: data.product_id,
+        combineProductMetaId: data.id,
+      });
+    }
+
+    if (metaFieldKey === "recommended_produccts") {
+      fetchData({
+        productId: data.product_id,
+        recommededProductMetaId: data.id,
+      });
+    }
   };
 
   const handleAddRelatedProduct = async () => {
@@ -124,10 +136,25 @@ const SubProduct = ({
       );
 
       const { data } = await response.json();
-      fetchData({
-        productId: data.product_id,
-        recommededProductMetaId: data.id,
-      });
+      if (metaFieldKey === "outfits") {
+        fetchData({
+          productId: data.product_id,
+          outfitProductMetaId: data.id,
+        });
+      }
+      if (metaFieldKey === "combine_products") {
+        fetchData({
+          productId: data.product_id,
+          combineProductMetaId: data.id,
+        });
+      }
+
+      if (metaFieldKey === "recommended_produccts") {
+        fetchData({
+          productId: data.product_id,
+          recommededProductMetaId: data.id,
+        });
+      }
     } catch (error) {
       console.error(
         "Error selecting products or fetching metafield data:",
@@ -137,8 +164,6 @@ const SubProduct = ({
   };
 
   const handleEditRelatedProduct = async () => {
-    console.log(title);
-    console.log(metaFieldKey);
     const arrayId = subProducts.map((product: any) => {
       return {
         id: product.id,
@@ -172,10 +197,25 @@ const SubProduct = ({
       );
 
       const { data } = await response.json();
-      fetchData({
-        productId: data.product_id,
-        recommededProductMetaId: data.id,
-      });
+      if (metaFieldKey === "outfits") {
+        fetchData({
+          productId: data.product_id,
+          outfitProductMetaId: data.id,
+        });
+      }
+      if (metaFieldKey === "combine_products") {
+        fetchData({
+          productId: data.product_id,
+          combineProductMetaId: data.id,
+        });
+      }
+
+      if (metaFieldKey === "recommended_produccts") {
+        fetchData({
+          productId: data.product_id,
+          recommededProductMetaId: data.id,
+        });
+      }
     } catch (error) {
       console.error(
         "Error selecting products or fetching metafield data:",
@@ -188,27 +228,40 @@ const SubProduct = ({
     const queryString = updatedProductIds
       ?.map((id, index) => `productIds[${index}]=${encodeURIComponent(id)}`)
       .join("&");
-    console.log("Save changes");
     const parts: any = mainId?.split("/");
     const productId = parseInt(parts[parts?.length - 1]);
     const response = await fetch(
       `/api/metafield?${queryString}&mainProductId=${productId}&metaFieldNameSpace=${metaFieldNameSpace}&metaFieldKey=${metaFieldKey}`,
     );
-
     const { data } = await response.json();
-    fetchData({
-      productId: data.product_id,
-      recommededProductMetaId: data.id,
-    });
+    if (metaFieldKey === "outfits") {
+      fetchData({
+        productId: data.product_id,
+        outfitProductMetaId: data.id,
+      });
+    }
+    if (metaFieldKey === "combine_products") {
+      fetchData({
+        productId: data.product_id,
+        combineProductMetaId: data.id,
+      });
+    }
+
+    if (metaFieldKey === "recommended_produccts") {
+      fetchData({
+        productId: data.product_id,
+        recommededProductMetaId: data.id,
+      });
+    }
   };
   return (
-    <div className=" flex border w-full border-blue-400 rounded-lg flex-col">
+    <div className=" flex border w-full border-blue-400 overflow-hidden rounded-lg flex-col">
       <AnimatePresence>
-        <div className=" flex flex-col items-center">
-          <div className="flex justify-between items-center border-b p-1  w-full">
-            <h1 className="font-semibold px-2 py-1 text-lg tracking-tight  ">
+        <div className="  flex flex-col items-center">
+          <div className="flex justify-between bg-[#f1f1f1] items-center border-b p-2  w-full">
+            <h3 className="font-semibold p-1 text-lg tracking-tight  ">
               {title}
-            </h1>
+            </h3>
             <div className="flex items-center gap-2 ">
               {subproductId.length !== 0 && (
                 <button
@@ -221,8 +274,8 @@ const SubProduct = ({
             </div>
           </div>
           <div className="flex   border-b w-full px-2 py-4">
-            <div className="flex items-center justify-between w-full">
-              <p className=" font-semibold text-sm   w-[35%] px-4 text-left leading-4 text-gray-700 tracking-wider">
+            <div className="flex items-center justifybetween w-full">
+              <p className=" font-semibold text-sm  w-[80%] pl-1 text-left leading-4 text-gray-700 tracking-wider">
                 {subproductId.length !== 0 ? (
                   <div
                     onClick={() => {
@@ -249,19 +302,12 @@ const SubProduct = ({
                     </label>
                   </div>
                 ) : (
-                  "Product title"
+                  "Product"
                 )}
               </p>
 
-              <p className=" font-semibold text-sm px-4 text-left leading-4 text-gray-700 tracking-wider">
+              <p className=" font-semibold text-center text-sm px-4  w-[20%]  leading-4 text-gray-700 tracking-wider">
                 Inventory
-              </p>
-              <p className=" font-semibold text-sm  px-4text-left leading-4 text-gray-700 tracking-wider">
-                Price
-              </p>
-
-              <p className=" font-semibold text-sm w-[20%]  px-4 text-left leading-4 text-gray-700 tracking-wider">
-                Vendor
               </p>
             </div>
           </div>
@@ -292,7 +338,7 @@ const SubProduct = ({
             >
               <div className="flex justify-between w-full">
                 <div className="flex  justify-between w-full items-center">
-                  <div className="flex items-center  w-2/5  px-2">
+                  <div className="flex items-center  w-[80%]  px-1">
                     <motion.div
                       className="cursor-pointer  px-2 py-1"
                       draggable={true}
@@ -307,7 +353,7 @@ const SubProduct = ({
                       <MdDragIndicator className="w-5 h-5" />
                     </motion.div>
                     <div>
-                      <p className="py-2 px-4 font-medium flex items-center gap-4">
+                      <p className="py-2 px-1 font-medium flex items-center gap-4">
                         <span className="border w-10 flex  items-center justify-center h-10 rounded-lg ">
                           {product.featuredImage === null ? (
                             <DefaultGallery />
@@ -319,19 +365,19 @@ const SubProduct = ({
                             />
                           )}
                         </span>
-                        <span className="">{product?.title}</span>
+                        <p className="flex flex-col">
+                          <span className="font-semibold">
+                            {product?.title}
+                          </span>
+                          <p>£ {product.priceRange?.minVariantPrice?.amount}</p>
+                          <p className="text-xs">{product.vendor}</p>
+                        </p>
                       </p>
                     </div>
                   </div>
 
-                  <p className="py-2 px-4  text-red-600">
+                  <p className="py-2 px-4 w-[20%] text-center text-red-600">
                     {product.totalInventory}
-                  </p>
-                  <p className="py-2 px-4 w-[14%] ">
-                    £ {product.priceRange?.minVariantPrice?.amount}
-                  </p>
-                  <p className="py-2 px-4 w-[20%] capitalize">
-                    {product.vendor}
                   </p>
                 </div>
               </div>

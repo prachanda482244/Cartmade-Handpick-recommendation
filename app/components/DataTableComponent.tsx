@@ -21,11 +21,20 @@ const DataTableComponent = ({
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [subProducts, setSubProducts] = useState<subProducts[]>([]);
   const [outfitsProduct, setOutfitsProduct] = useState<subProducts[]>([]);
+  const [combineProduct, setCombineProduct] = useState<subProducts[]>([]);
+  const [originalCombineProduct, setOriginalCombineProduct] = useState<
+    subProducts[]
+  >([]);
   const [originalProduct, setOriginalProduct] = useState<subProducts[]>([]);
   const [originalOutfitProduct, setOriginalOutfitProduct] = useState<
     subProducts[]
   >([]);
   const [isProductLoading, setIsProductLoading] = useState<boolean>(true);
+  const [recommendedMetaId, setRecommendedMetaId] = useState<string | number>(
+    "",
+  );
+  const [outFitMetaId, setOutFitMetaId] = useState<string | number>("");
+  const [combinedMetaId, setCombinedMetaId] = useState<string | number>("");
   const [activeId, setActiveId] = useState<string>("");
   const [product_Id, setProductId] = useState<string | number>("");
 
@@ -33,16 +42,17 @@ const DataTableComponent = ({
     productId,
     recommededProductMetaId,
     outfitProductMetaId,
+    combineProductMetaId,
   }: {
     productId: number | string;
     recommededProductMetaId?: number | string;
     outfitProductMetaId?: number | string;
+    combineProductMetaId?: number | string;
   }) => {
-    console.log(productId, "product id fetch data");
     setProductId(productId);
     setIsProductLoading(true);
     try {
-      if (recommededProductMetaId) {
+      if (recommededProductMetaId !== undefined) {
         const recommededProduct = await fetch(
           `/api/fetchmetafield?productId=${productId}&metaFieldId=${recommededProductMetaId}`,
         );
@@ -60,8 +70,7 @@ const DataTableComponent = ({
           );
         }
       }
-
-      if (outfitProductMetaId) {
+      if (outfitProductMetaId !== undefined) {
         const outfitProduct = await fetch(
           `/api/fetchmetafield?productId=${productId}&metaFieldId=${outfitProductMetaId}`,
         );
@@ -70,7 +79,6 @@ const DataTableComponent = ({
           setIsProductLoading(false);
           const { data } = await outfitProduct.json();
           setOutfitsProduct(data);
-          setOriginalProduct(data);
           setOriginalOutfitProduct(data);
         } else {
           setIsProductLoading(false);
@@ -81,14 +89,37 @@ const DataTableComponent = ({
           );
         }
       }
+      if (combineProductMetaId !== undefined) {
+        const combineProduct = await fetch(
+          `/api/fetchmetafield?productId=${productId}&metaFieldId=${combineProductMetaId}`,
+        );
+        if (combineProduct.ok) {
+          setIsProductLoading(false);
+          const { data } = await combineProduct.json();
+          setCombineProduct(data);
+          setOriginalCombineProduct(data);
+        } else {
+          setIsProductLoading(false);
+          console.log("Hello from else");
+          console.error(
+            "Failed to fetch metafield data:",
+            combineProduct.statusText,
+          );
+        }
+      }
     } catch (error) {
       console.error("Error fetching metafield data:", error);
       setIsProductLoading(false);
     }
   };
   useEffect(() => {
-    fetchData({ productId: product_Id });
-  }, [product_Id]);
+    fetchData({
+      productId: product_Id,
+      recommededProductMetaId: recommendedMetaId,
+      combineProductMetaId: combinedMetaId,
+      outfitProductMetaId: outFitMetaId,
+    });
+  }, [product_Id, recommendedMetaId, combinedMetaId, outFitMetaId]);
 
   const handleClick = async (
     productId: string,
@@ -99,7 +130,6 @@ const DataTableComponent = ({
     setExpandedRow(isCurrentlyExpanded ? null : productId);
 
     if (!isCurrentlyExpanded && metafieldId) {
-      console.log(metafieldId);
       const metaIds = metafieldId.map(
         ({
           node,
@@ -109,10 +139,16 @@ const DataTableComponent = ({
           };
         }) => node.id.split("/")[node.id.split("/").length - 1],
       );
+      console.log(metafieldId);
+      console.log(metaIds);
+      setRecommendedMetaId(metaIds[0]);
+      setOutFitMetaId(metaIds[1]);
+      setCombinedMetaId(metaIds[2]);
       fetchData({
         productId,
         recommededProductMetaId: metaIds[0],
         outfitProductMetaId: metaIds[1],
+        combineProductMetaId: metaIds[2],
       });
     }
   };
@@ -193,6 +229,7 @@ const DataTableComponent = ({
                 metaFieldNameSpace="custom"
                 metaFieldKey="recommended_produccts"
               />
+
               <SubProduct
                 title="Outfit product"
                 subProducts={outfitsProduct}
@@ -202,6 +239,17 @@ const DataTableComponent = ({
                 mainId={id}
                 metaFieldNameSpace="custom"
                 metaFieldKey="outfits"
+              />
+
+              <SubProduct
+                title="Combine with product"
+                subProducts={combineProduct}
+                setSubProducts={setCombineProduct}
+                fetchData={fetchData}
+                originalProduct={originalCombineProduct}
+                mainId={id}
+                metaFieldNameSpace="custom"
+                metaFieldKey="combine_products"
               />
             </div>
           ))}
@@ -216,7 +264,7 @@ const DataTableComponent = ({
       ) : (
         <div className="overflow-x-auto">
           <div className="min-w-full   text-[13px] bg-white">
-            <div className="flex justify-between items-center px-2 bg-[#f7f7f7]">
+            <div className="flex justify-between items-center px-4 bg-[#f7f7f7]">
               <p className="py-2 font-medium tracking-tight w-[20%]  text-left leading-4 text-[#616161] ">
                 Product
               </p>

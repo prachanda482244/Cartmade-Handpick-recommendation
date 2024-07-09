@@ -28,7 +28,7 @@ export const query = `
         id
         status
         totalInventory
-         metafields(first:2 , keys:["custom.recommended_produccts","custom.outfits"]) { 
+         metafields(first:3 , keys:["custom.recommended_produccts","custom.outfits","custom.combine_products"]) { 
             edges {
               node {
                 id
