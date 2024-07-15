@@ -1,19 +1,21 @@
 {{ 'style.css' | asset_url | stylesheet_tag }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
-
 {% assign recommended_products = product.metafields.custom.recommended_produccts.value %}
 {% assign outfit_products = product.metafields.custom.outfits.value %}
 {% assign combine_products = product.metafields.custom.combine_products.value %}
-{%if recommended_products != blank%}
+
+{% if recommended_products != blank %}
+  {% if block.settings.show_recommended_products %}
 <div class="hprWrapper">
   {% assign items_per_row = block.settings.items_per_row %}
   <style>
- .hprContainer{
+    .hprContainer {
       --hprTitleColor: {{ block.settings.title_color }};
       --hprPriceColor: {{ block.settings.price_color }};
       --hprButtonColor: {{ block.settings.button_color }};
-      --hprPrimaryWidth:{{ block.settings.button_width }}px;
+      --hprDiscountColor:{{ block.settings.discount_color }};
+      --hprPrimaryWidth: {{ block.settings.button_width }}px;
     }
   </style>
   <div class="hprContainer">
@@ -26,430 +28,384 @@
         {% if block.settings.grid_type == 'static' %}
         <div class="hprproductGridWrapper">
           <div class="hprgrid{{ items_per_row }}">
-            {% else %}
-            <div class="swiper hprSwiper">
-              <div class="swiper-wrapper">
-                {% endif %}
+        {% else %}
+        <div class="swiper hprSwiper">
+          <div class="swiper-wrapper">
+        {% endif %}
 
-                {% for product in recommended_products %}
-
-                {% if block.settings.grid_type == 'static' %}
-                <div class="hprgridSingle">
-                  {% else %}
-                  <div class="swiper-slide">
-                    {% endif %}
-
-                    <div class="hprCardWrapper">
-                      <div class="hprCardInner">
-                        <a href="{{ product.url }}">
-                          <figure class="figure-{{ block.settings.image_ratio }}">
-                            <img class=" product-image" src="{{ product.featured_image | img_url }}"
-                              alt="{{ product.title }}" />
-                              
-                              {% if  product.first_available_variant.compare_at_price and block.settings.show_discount %}
-                                <span class="position-{{block.settings.position  }}">30%</span>
-                                {% endif %}
-                          </figure>
-                          <div class="productContentHolder">
-                            {% if block.settings.show_vendor %}
-                            <div class="hprvendorName">
-                              {{ product.vendor }}
-                            </div>
-                            {% endif %}
-                            <h5>
-                              {{ product.title }}
-                            </h5>
-                            <div class="hprpriceWrapper">
-                              <span class="hprproductPrice">
-                                {{ product.price | money }}
-                              </span>
-                              <span class="hprcomparedAtPrice"> {{ product.first_available_variant.compare_at_price |
-                                money}} </span>
-                            </div>
-                          </div>
-                        </a>
-
-                        <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
-                        <input type="hidden" value="{{ product.first_available_variant.id }}"
-                          class="first-variant-id" />
-                        <div class="selection_type">
-                          {% if block.settings.variants=="add_to_cart" %}
-                          {% assign numVariants = product.variants.size %}
-                          {% if numVariants == 1 %}
-
-                          {% else %}
-                          <select class="select-variant" onchange="updatePrice(event)">
-                            {% for variant in product.variants %}
-                            {% if variant.title !="Default Title" %}
-                            <option data-price="{{ variant.price | money }}"
-                              data-img="{{ variant.image.src  |  default: product.featured_image  |  image_url  }}"
-                              value="{{variant.id}}">{{ variant.title }}</option>
-                            {% endif %}
-                            {% endfor %}
-                          </select>
-                          {%endif%}
-                          {% endif %}
-                        </div>
-                        <div class="addToCartHolder">
-
-                          {% if block.settings.variants=="add_to_cart" %}
-                          <button onClick="addToCart(event)" class="hpratcBtn add-to-cart">
-                            {{ block.settings.button_title }}
-                          </button>
-                          {% else if block.settings.variants=="view_details" %}
-                          <button class="hpratcBtn add-to-cart">
-                            <a href="{{ product.url }}">
-                              View Details
-                            </a>
-                          </button>
-
-
-                          {% endif %}
-
-                        </div>
-                      </div>
-                    </div>
-
-                    {% if block.settings.grid_type == 'static' %}
-                  </div>
-
-                  {% else %}
-                </div>
-                {% endif %}
-
-                {% endfor %}
-              </div>
-            </div>
-
-            {% if block.settings.grid_type == 'slider' %}
-            <div class="hprswiper-button-next">
-              <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1.40039 1.40002L7.00039 7.00002L1.40039 12.6" stroke="white" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </div>
-            <div class="hprswiper-button-prev">
-              <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6.59961 1.3999L0.999609 6.9999L6.59961 12.5999" stroke="white" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </div>
-            {% endif %}
-          </div>
-
-        </div>
-      </div>
-</div>
-</div>
-
-<div class="hprWrapper">
-    <div class="hprContainer">
-      <div class="hprRow">
-        <div class="hprcol-12">
-          <h4 class="hprTitle">
-            {{ block.settings.outfits_title }}
-          </h4>
-  
+        {% for product in recommended_products %}
           {% if block.settings.grid_type == 'static' %}
-          <div class="hprproductGridWrapper">
-            <div class="hprgrid{{ items_per_row }}">
-              {% else %}
-              <div class="swiper hprSwiper">
-                <div class="swiper-wrapper">
-                  {% endif %}
-  
-                  {% for product in outfit_products %}
-  
-                  {% if block.settings.grid_type == 'static' %}
-                  <div class="hprgridSingle">
-                    {% else %}
-                    <div class="swiper-slide">
-                      {% endif %}
-  
-                      <div class="hprCardWrapper">
-                        <div class="hprCardInner">
-                          <a href="{{ product.url }}">
-                            <figure class="figure-{{ block.settings.image_ratio }}">
-                              <img class=" product-image" src="{{ product.featured_image | img_url }}"
-                                alt="{{ product.title }}" />
-                            </figure>
-                            <div class="productContentHolder">
-                              {% if block.settings.show_vendor %}
-                              <div class="hprvendorName">
-                                {{ product.vendor }}
-                              </div>
-                              {% endif %}
-                              <h5>
-                                {{ product.title }}
-                              </h5>
-                              <div class="hprpriceWrapper">
-                                <span class="hprproductPrice">
-                                  {{ product.price | money }}
-                                </span>
-                                <span class="hprcomparedAtPrice"> {{ product.first_available_variant.compare_at_price |
-                                  money}} </span>
-                              </div>
-                            </div>
-                          </a>
-  
-                          <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
-                          <input type="hidden" value="{{ product.first_available_variant.id }}"
-                            class="first-variant-id" />
-                          <div class="selection_type">
-                            {% if block.settings.variants=="add_to_cart" %}
-                            {% assign numVariants = product.variants.size %}
-                            {% if numVariants == 1 %}
-  
-                            {% else %}
-                            <select class="select-variant" onchange="updatePrice(event)">
-                              {% for variant in product.variants %}
-                              {% if variant.title !="Default Title" %}
-                              <option data-price="{{ variant.price | money }}"
-                                data-img="{{ variant.image.src  |  default: product.featured_image  |  image_url  }}"
-                                value="{{variant.id}}">{{ variant.title }}</option>
-                              {% endif %}
-                              {% endfor %}
-                            </select>
-                            {%endif%}
-                            {% endif %}
-                          </div>
-                          <div class="addToCartHolder">
-  
-                            {% if block.settings.variants=="add_to_cart" %}
-                            <button onClick="addToCart(event)" class="hpratcBtn add-to-cart">
-                              {{ block.settings.button_title }}
-                            </button>
-                            {% else if block.settings.variants=="view_details" %}
-                            <button class="hpratcBtn add-to-cart">
-                              <a href="{{ product.url }}">
-                                View Details
-                              </a>
-                            </button>
-  
-  
-                            {% endif %}
-  
-                          </div>
-                        </div>
-                      </div>
-  
-                      {% if block.settings.grid_type == 'static' %}
-                    </div>
-  
-                    {% else %}
-                  </div>
-                  {% endif %}
-  
-                  {% endfor %}
-                </div>
-              </div>
-  
-              {% if block.settings.grid_type == 'slider' %}
-              <div class="hprswiper-button-next">
-                <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1.40039 1.40002L7.00039 7.00002L1.40039 12.6" stroke="white" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-              </div>
-              <div class="hprswiper-button-prev">
-                <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6.59961 1.3999L0.999609 6.9999L6.59961 12.5999" stroke="white" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-              </div>
-              {% endif %}
-            </div>
-  
-          </div>
-        </div>
-      </div>
-</div>
-<div class="hprWrapper">
+          <div class="hprgridSingle">
+          {% else %}
+          <div class="swiper-slide">
+          {% endif %}
 
-      <div class="hprContainer">
-        <div class="hprRow">
-          <div class="hprcol-12">
-            <h4 class="hprTitle">
-              {{ block.settings.combine_title }}
-            </h4>
-    
-            {% if block.settings.grid_type == 'static' %}
-            <div class="hprproductGridWrapper">
-              <div class="hprgrid{{ items_per_row }}">
-                {% else %}
-                <div class="swiper hprSwiper">
-                  <div class="swiper-wrapper">
-                    {% endif %}
-    
-                    {% for product in combine_products %}
-    
-                    {% if block.settings.grid_type == 'static' %}
-                    <div class="hprgridSingle">
-                      {% else %}
-                      <div class="swiper-slide">
-                        {% endif %}
-    
-                        <div class="hprCardWrapper">
-                          <div class="hprCardInner">
-                            <a href="{{ product.url }}">
-                              <figure class="figure-{{ block.settings.image_ratio }}">
-                                <img class=" product-image" src="{{ product.featured_image | img_url }}"
-                                alt="{{ product.title }}" />
-                                </figure>
-                                
-                                
-                              <div class="productContentHolder">
-                                {% if block.settings.show_vendor %}
-                                <div class="hprvendorName">
-                                  {{ product.vendor }}
-                                </div>
-                                {% endif %}
-                                <h5>
-                                  {{ product.title }}
-                                </h5>
-                                <div class="hprpriceWrapper">
-                                  <span class="hprproductPrice">
-                                    {{ product.price | money }}
-                                  </span>
-                                  <span class="hprcomparedAtPrice"> {{ product.first_available_variant.compare_at_price |
-                                    money}} </span>
-                                </div>
-                              </div>
-                            </a>
-                       
-                            <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
-                            <input type="hidden" value="{{ product.first_available_variant.id }}"
-                              class="first-variant-id" />
-                            <div class="selection_type">
-                              {% if block.settings.variants=="add_to_cart" %}
-                              {% assign numVariants = product.variants.size %}
-                              {% if numVariants == 1 %}
-    
-                              {% else %}
-                              <select class="select-variant" onchange="updatePrice(event)">
-                                {% for variant in product.variants %}
-                                {% if variant.title !="Default Title" %}
-                                <option data-price="{{ variant.price | money }}"
-                                  data-img="{{ variant.image.src  |  default: product.featured_image  |  image_url  }}"
-                                  value="{{variant.id}}">{{ variant.title }}</option>
-                                {% endif %}
-                                {% endfor %}
-                              </select>
-                              {%endif%}
-                              {% endif %}
-                            </div>
-                            <div class="addToCartHolder">
-    
-                              {% if block.settings.variants=="add_to_cart" %}
-                              <button onClick="addToCart(event)" class="hpratcBtn add-to-cart">
-                                {{ block.settings.button_title }}
-                              </button>
-                              {% else if block.settings.variants=="view_details" %}
-                              <button class="hpratcBtn add-to-cart">
-                                <a href="{{ product.url }}">
-                                  View Details
-                                </a>
-                              </button>
-    
-    
-                              {% endif %}
-    
-                            </div>
-                          </div>
-                        </div>
-    
-                        {% if block.settings.grid_type == 'static' %}
-                      </div>
-    
-                      {% else %}
-                    </div>
-                    {% endif %}
-    
-                    {% endfor %}
+          <div class="hprCardWrapper">
+            <div class="hprCardInner">
+              <a href="{{ product.url }}">
+                <figure class="figure-{{ block.settings.image_ratio }}">
+                  <img class="product-image" src="{{ product.featured_image | img_url }}" alt="{{ product.title }}" />
+                  {% if product.first_available_variant.compare_at_price and block.settings.show_discount %}
+                    {% assign  floatCompareAtPrice = product.first_available_variant.compare_at_price | times: 1.0  %}
+                    <span class="position-{{block.settings.position}} "> {{   product.first_available_variant.compare_at_price  |  minus: product.price |  divided_by:floatCompareAtPrice |  times: 100 | floor }}%</span>
+                  {% endif %}
+                </figure>
+                <div class="productContentHolder">
+                  {% if block.settings.show_vendor %}
+                  <div class="hprvendorName">{{ product.vendor }}</div>
+                  {% endif %}
+                  <h5>{{ product.title }}</h5>
+                  
+                  <div class="hprpriceWrapper">
+                    
+                    <span class="hprproductPrice">{{ product.price | money }}</span>
+                    <span class="hprcomparedAtPrice">{{ product.first_available_variant.compare_at_price | money }}</span>
                   </div>
                 </div>
-    
-                {% if block.settings.grid_type == 'slider' %}
-                <div class="hprswiper-button-next">
-                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.40039 1.40002L7.00039 7.00002L1.40039 12.6" stroke="white" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round"></path>
-                  </svg>
-                </div>
-                <div class="hprswiper-button-prev">
-                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6.59961 1.3999L0.999609 6.9999L6.59961 12.5999" stroke="white" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round"></path>
-                  </svg>
-                </div>
+              </a>
+              <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
+              <input type="hidden" value="{{ product.first_available_variant.id }}" class="first-variant-id" />
+              <div class="selection_type">
+                {% if block.settings.variants == "add_to_cart" %}
+                {% assign numVariants = product.variants.size %}
+                {% if numVariants == 1 %}
+                {% else %}
+                <select class="select-variant" onchange="updatePrice(event)">
+                  {% for variant in product.variants %}
+                  {% if variant.title != "Default Title" %}
+                  <option data-price="{{ variant.price | money }}" data-img="{{ variant.image.src | default: product.featured_image | image_url }}" value="{{ variant.id }}">{{ variant.title }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+                {% endif %}
                 {% endif %}
               </div>
-    
+              <div class="addToCartHolder">
+                {% if block.settings.variants == "add_to_cart" %}
+                <button onClick="addToCart(event)" class="hpratcBtn add-to-cart">{{ block.settings.button_title }}</button>
+                {% else if block.settings.variants == "view_details" %}
+                <button class="hpratcBtn add-to-cart">
+                  <a href="{{ product.url }}">View Details</a>
+                </button>
+                {% else if block.settings.variants=="show_none" %}
+                nonre
+                {% endif %}
+              </div>
             </div>
           </div>
+          
+          {% if block.settings.grid_type == 'static' %}
+          </div>
+          {% else %}
+          </div>
+          {% endif %}
+        {% endfor %}
+        
+        {% if block.settings.grid_type == 'static' %}
+          </div>
+        {% else %}
+          </div>
         </div>
+        {% endif %}
+        
+        {% if block.settings.grid_type == 'slider' %}
+        <div class="hprswiper-button-next">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.40039 1.40002L7.00039 7.00002L1.40039 12.6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
         </div>
-  
+        <div class="hprswiper-button-prev">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.59961 1.3999L0.999609 6.9999L6.59961 12.5999" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+  {% endif %}
+{% endif %}
 
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const swiper = new Swiper(".hprSwiper", {
-          slidesPerView: {{ block.settings.number_of_rows }},
-        spaceBetween: {{ block.settings.gaps }},
-        navigation: {
-        nextEl: ".hprswiper-button-next",
-        prevEl: ".hprswiper-button-prev",
-      },
-        });
+{% if outfit_products != blank %}
+  {% if block.settings.show_outfit_products %}
+<div class="hprWrapper">
+  <div class="hprContainer">
+    <div class="hprRow">
+      <div class="hprcol-12">
+        <h4 class="hprTitle">{{ block.settings.outfits_title }}</h4>
+
+        {% if block.settings.grid_type == 'static' %}
+        <div class="hprproductGridWrapper">
+          <div class="hprgrid{{ items_per_row }}">
+        {% else %}
+        <div class="swiper hprSwiper">
+          <div class="swiper-wrapper">
+        {% endif %}
+
+        {% for product in outfit_products %}
+          {% if block.settings.grid_type == 'static' %}
+          <div class="hprgridSingle">
+          {% else %}
+          <div class="swiper-slide">
+          {% endif %}
+
+          <div class="hprCardWrapper">
+            <div class="hprCardInner">
+              <a href="{{ product.url }}">
+                <figure class="figure-{{ block.settings.image_ratio }}">
+                  <img class="product-image" src="{{ product.featured_image | img_url }}" alt="{{ product.title }}" />
+                  {% if product.first_available_variant.compare_at_price and block.settings.show_discount %}
+                    {% assign  floatCompareAtPrice = product.first_available_variant.compare_at_price | times: 1.0  %}
+                    <span class="position-{{block.settings.position}}">{{   product.first_available_variant.compare_at_price  |  minus: product.price |  divided_by:floatCompareAtPrice |  times: 100 | floor }}%</span>
+                  {% endif %}
+                </figure>
+                <div class="productContentHolder">
+                  {% if block.settings.show_vendor %}
+                  <div class="hprvendorName">{{ product.vendor }}</div>
+                  {% endif %}
+                  <h5>{{ product.title }}</h5>
+                  <div class="hprpriceWrapper">
+                    <span class="hprproductPrice">{{ product.price | money }}</span>
+                    <span class="hprcomparedAtPrice">{{ product.first_available_variant.compare_at_price | money }}</span>
+                  </div>
+                </div>
+              </a>
+              <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
+              <input type="hidden" value="{{ product.first_available_variant.id }}" class="first-variant-id" />
+              <div class="selection_type">
+                {% if block.settings.variants == "add_to_cart" %}
+                {% assign numVariants = product.variants.size %}
+                {% if numVariants == 1 %}
+                {% else %}
+                <select class="select-variant" onchange="updatePrice(event)">
+                  {% for variant in product.variants %}
+                  {% if variant.title != "Default Title" %}
+                  <option data-price="{{ variant.price | money }}" data-img="{{ variant.image.src | default: product.featured_image | image_url }}" value="{{ variant.id }}">{{ variant.title }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+                {% endif %}
+                {% endif %}
+              </div>
+              <div class="addToCartHolder">
+                {% if block.settings.variants == "add_to_cart" %}
+                <button onClick="addToCart(event)" class="hpratcBtn add-to-cart">{{ block.settings.button_title }}</button>
+                {% else if block.settings.variants == "view_details" %}
+                <button class="hpratcBtn add-to-cart">
+                  <a href="{{ product.url }}">View Details</a>
+                </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          {% if block.settings.grid_type == 'static' %}
+          </div>
+          {% else %}
+          </div>
+          {% endif %}
+        {% endfor %}
+        
+        {% if block.settings.grid_type == 'static' %}
+          </div>
+        {% else %}
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if block.settings.grid_type == 'slider' %}
+        <div class="hprswiper-button-next">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.40039 1.40002L7.00039 7.00002L1.40039 12.6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        <div class="hprswiper-button-prev">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.59961 1.3999L0.999609 6.9999L6.59961 12.5999" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+  {% endif %}
+{% endif %}
+
+{% if combine_products != blank %}
+  {% if block.settings.show_combine_products %}
+<div class="hprWrapper">
+  <div class="hprContainer">
+    <div class="hprRow">
+      <div class="hprcol-12">
+        <h4 class="hprTitle">{{ block.settings.combine_title }}</h4>
+
+        {% if block.settings.grid_type == 'static' %}
+        <div class="hprproductGridWrapper">
+          <div class="hprgrid{{ items_per_row }}">
+        {% else %}
+        <div class="swiper hprSwiper">
+          <div class="swiper-wrapper">
+        {% endif %}
+
+        {% for product in combine_products %}
+          {% if block.settings.grid_type == 'static' %}
+          <div class="hprgridSingle">
+          {% else %}
+          <div class="swiper-slide">
+          {% endif %}
+
+          <div class="hprCardWrapper">
+            <div class="hprCardInner">
+              <a href="{{ product.url }}">
+                <figure class="figure-{{ block.settings.image_ratio }}">
+                  <img class="product-image" src="{{ product.featured_image | img_url }}" alt="{{ product.title }}" />
+                  {% if product.first_available_variant.compare_at_price and block.settings.show_discount %}
+                    {% assign  floatCompareAtPrice = product.first_available_variant.compare_at_price | times: 1.0  %}
+                    <span class="position-{{block.settings.position}}">{{   product.first_available_variant.compare_at_price  |  minus: product.price |  divided_by:floatCompareAtPrice |  times: 100 | floor }}%</span>
+                  {% endif %}
+                </figure>
+                <div class="productContentHolder">
+                  {% if block.settings.show_vendor %}
+                  <div class="hprvendorName">{{ product.vendor }}</div>
+                  {% endif %}
+                  <h5>{{ product.title }}</h5>
+                  <div class="hprpriceWrapper">
+                    <span class="hprproductPrice">{{ product.price | money }}</span>
+                    <span class="hprcomparedAtPrice">{{ product.first_available_variant.compare_at_price | money }}</span>
+                  </div>
+                </div>
+              </a>
+              <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
+              <input type="hidden" value="{{ product.first_available_variant.id }}" class="first-variant-id" />
+              <div class="selection_type">
+                {% if block.settings.variants == "add_to_cart" %}
+                {% assign numVariants = product.variants.size %}
+                {% if numVariants == 1 %}
+                {% else %}
+                <select class="select-variant" onchange="updatePrice(event)">
+                  {% for variant in product.variants %}
+                  {% if variant.title != "Default Title" %}
+                  <option data-price="{{ variant.price | money }}" data-img="{{ variant.image.src | default: product.featured_image | image_url }}" value="{{ variant.id }}">{{ variant.title }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+                {% endif %}
+                {% endif %}
+              </div>
+              <div class="addToCartHolder">
+                {% if block.settings.variants == "add_to_cart" %}
+                <button onClick="addToCart(event)" class="hpratcBtn add-to-cart">{{ block.settings.button_title }}</button>
+                {% else if block.settings.variants == "view_details" %}
+                <button class="hpratcBtn add-to-cart">
+                  <a href="{{ product.url }}">View Details</a>
+                </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          {% if block.settings.grid_type == 'static' %}
+          </div>
+          {% else %}
+          </div>
+          {% endif %}
+        {% endfor %}
+        
+        {% if block.settings.grid_type == 'static' %}
+          </div>
+        {% else %}
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if block.settings.grid_type == 'slider' %}
+        <div class="hprswiper-button-next">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.40039 1.40002L7.00039 7.00002L1.40039 12.6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        <div class="hprswiper-button-prev">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.59961 1.3999L0.999609 6.9999L6.59961 12.5999" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+  {% endif %}
+{% endif %}
+
+{{ 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js' | script_tag }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var swiper = new Swiper('.hprSwiper', {
+    slidesPerView: 3,
+    spaceBetween: 10,
+    navigation: {
+      nextEl: '.hprswiper-button-next',
+      prevEl: '.hprswiper-button-prev',
+    },
+  });
+
+  document.querySelectorAll('.select-variant').forEach(function(select) {
+    select.addEventListener('change', function(event) {
+      updatePrice(event);
     });
-    </script>
-    <script>
-      function updatePrice(e) {
-        const selectedOption = event.target.options[event.target.selectedIndex];
-        const price = selectedOption.getAttribute('data-price');
-        const imageSrc = selectedOption.getAttribute('data-img');
-        const cardWrapper = event.target.closest('.hprCardWrapper');
-        cardWrapper.querySelector('.hprproductPrice').innerHTML = price;
+  });
 
-        if (imageSrc) {
-          cardWrapper.querySelector('.product-image').src = imageSrc;
-        }
-      }
-      function addToCart(e) {
-        if (parseInt(e.target.closest('.hprCardWrapper').querySelector('.num-variants').value) === 1) {
-          let variantId = e.target.closest('.hprCardWrapper').querySelector('.first-variant-id').value
-          const data = {
-            id: variantId,
-            quantity: 1
-          }
-          addToCartAjax(data)
-        } else {
-          let variantId = e.target.closest('.hprCardWrapper').querySelector('select').value
-          const data = {
-            id: variantId,
-            quantity: 1
-          }
-          addToCartAjax(data)
-        }
-      }
+  function updatePrice(event) {
+    var select = event.target;
+    var selectedOption = select.options[select.selectedIndex];
+    var productPrice = selectedOption.getAttribute('data-price');
+    var productImage = selectedOption.getAttribute('data-img');
+    var productWrapper = select.closest('.hprCardWrapper');
+    productWrapper.querySelector('.hprproductPrice').textContent = productPrice;
+    productWrapper.querySelector('img').src = productImage;
+  }
 
-      function addToCartAjax(item) {
-        fetch('/cart/add.js', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(item)
-        }).then(response => response.json())
-          .then((data) => {
-            window.location.href = "/cart"
-          })
-      }
-    </script>
+  document.querySelectorAll('.add-to-cart').forEach(function(button) {
+    button.addEventListener('click', function(event) {
+      addToCart(event);
+    });
+  });
 
-    {%endif%}
+  function addToCart(event) {
+    event.preventDefault();
+    var button = event.target;
+    var productWrapper = button.closest('.hprCardWrapper');
+    var variantId = productWrapper.querySelector('.first-variant-id').value;
+    var quantity = 1;
+    if (productWrapper.querySelector('.select-variant')) {
+      variantId = productWrapper.querySelector('.select-variant').value;
+    }
+
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        items: [{
+          id: variantId,
+          quantity: quantity,
+        }],
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert('Product added to cart!');
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+});
+</script>
+
 
     {% schema %}
     {
@@ -485,6 +441,28 @@
     "default": false
     },
     {
+    "type": "header",
+    "content": "Display Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recommended_products",
+      "default": true,
+      "label": "Show Recommended Products"
+      },
+      {
+      "type": "checkbox",
+      "id": "show_outfit_products",
+      "default": true,
+      "label": "Show Outfits Products"
+      },
+      {
+      "type": "checkbox",
+      "id": "show_combine_products",
+      "default": true,
+      "label": "Show Combined Products"
+      },
+    {
     "type": "select",
     "id": "image_ratio",
     "label": "Image Ratio",
@@ -492,8 +470,11 @@
     { "value": "adapt_to_image", "label": "Adapt to Image" },
     { "value": "portrait", "label": "Portrait" },
     { "value": "square", "label": "Square" }
-    ],
-    "default": "square"
+    ]
+     },
+    {
+    "type": "header",
+    "content": "Discount Settings"
     },
     {
     "type": "select",
@@ -529,9 +510,24 @@
     "label": "Variants Layout",
     "options": [
     { "value": "add_to_cart", "label": "Show Add to Cart Button" },
-    { "value": "view_details", "label": "Show View Details Button" }
+    { "value": "view_details", "label": "Show View Details Button" },
+    { "value":"show_none","label":"Show none"}
     ],
     "default": "add_to_cart"
+    },
+   
+    {
+    "type": "range",
+    "id": "button_width",
+    "label": "Button Width",
+    "min": 100,
+    "max": 240,
+    "step": 10,
+    "default": 200
+    },
+    {
+      "type": "header",
+      "content":"Color settings"
     },
     {
     "type": "color",
@@ -552,18 +548,16 @@
     "default": "#000000"
     },
     {
-    "type": "range",
-    "id": "button_width",
-    "label": "Button Width",
-    "min": 100,
-    "max": 240,
-    "step": 10,
-    "default": 200
+    "type": "color",
+    "id": "discount_color",
+    "label": "Discount Color",
+    "default": "#000000"
     },
     {
     "type": "header",
     "content": "Layout Settings"
     },
+  
     {
     "type": "radio",
     "id": "grid_type",
