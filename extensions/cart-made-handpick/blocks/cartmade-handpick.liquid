@@ -3,11 +3,13 @@
 
 
 {% assign recommended_products = product.metafields.custom.recommended_produccts.value %}
+{% assign outfit_products = product.metafields.custom.outfits.value %}
+{% assign combine_products = product.metafields.custom.combine_products.value %}
 {%if recommended_products != blank%}
 <div class="hprWrapper">
   {% assign items_per_row = block.settings.items_per_row %}
   <style>
-    .hprContainer{
+ .hprContainer{
       --hprTitleColor: {{ block.settings.title_color }};
       --hprPriceColor: {{ block.settings.price_color }};
       --hprButtonColor: {{ block.settings.button_color }};
@@ -41,8 +43,12 @@
                       <div class="hprCardInner">
                         <a href="{{ product.url }}">
                           <figure class="figure-{{ block.settings.image_ratio }}">
-                            <img class=" product-image"
-                              src="{{ product.featured_image | img_url }}" alt="{{ product.title }}" />
+                            <img class=" product-image" src="{{ product.featured_image | img_url }}"
+                              alt="{{ product.title }}" />
+                              
+                              {% if  product.first_available_variant.compare_at_price and block.settings.show_discount %}
+                                <span class="position-{{block.settings.position  }}">30%</span>
+                                {% endif %}
                           </figure>
                           <div class="productContentHolder">
                             {% if block.settings.show_vendor %}
@@ -133,10 +139,259 @@
 
         </div>
       </div>
-    </div>
+</div>
+</div>
 
+<div class="hprWrapper">
+    <div class="hprContainer">
+      <div class="hprRow">
+        <div class="hprcol-12">
+          <h4 class="hprTitle">
+            {{ block.settings.outfits_title }}
+          </h4>
+  
+          {% if block.settings.grid_type == 'static' %}
+          <div class="hprproductGridWrapper">
+            <div class="hprgrid{{ items_per_row }}">
+              {% else %}
+              <div class="swiper hprSwiper">
+                <div class="swiper-wrapper">
+                  {% endif %}
+  
+                  {% for product in outfit_products %}
+  
+                  {% if block.settings.grid_type == 'static' %}
+                  <div class="hprgridSingle">
+                    {% else %}
+                    <div class="swiper-slide">
+                      {% endif %}
+  
+                      <div class="hprCardWrapper">
+                        <div class="hprCardInner">
+                          <a href="{{ product.url }}">
+                            <figure class="figure-{{ block.settings.image_ratio }}">
+                              <img class=" product-image" src="{{ product.featured_image | img_url }}"
+                                alt="{{ product.title }}" />
+                            </figure>
+                            <div class="productContentHolder">
+                              {% if block.settings.show_vendor %}
+                              <div class="hprvendorName">
+                                {{ product.vendor }}
+                              </div>
+                              {% endif %}
+                              <h5>
+                                {{ product.title }}
+                              </h5>
+                              <div class="hprpriceWrapper">
+                                <span class="hprproductPrice">
+                                  {{ product.price | money }}
+                                </span>
+                                <span class="hprcomparedAtPrice"> {{ product.first_available_variant.compare_at_price |
+                                  money}} </span>
+                              </div>
+                            </div>
+                          </a>
+  
+                          <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
+                          <input type="hidden" value="{{ product.first_available_variant.id }}"
+                            class="first-variant-id" />
+                          <div class="selection_type">
+                            {% if block.settings.variants=="add_to_cart" %}
+                            {% assign numVariants = product.variants.size %}
+                            {% if numVariants == 1 %}
+  
+                            {% else %}
+                            <select class="select-variant" onchange="updatePrice(event)">
+                              {% for variant in product.variants %}
+                              {% if variant.title !="Default Title" %}
+                              <option data-price="{{ variant.price | money }}"
+                                data-img="{{ variant.image.src  |  default: product.featured_image  |  image_url  }}"
+                                value="{{variant.id}}">{{ variant.title }}</option>
+                              {% endif %}
+                              {% endfor %}
+                            </select>
+                            {%endif%}
+                            {% endif %}
+                          </div>
+                          <div class="addToCartHolder">
+  
+                            {% if block.settings.variants=="add_to_cart" %}
+                            <button onClick="addToCart(event)" class="hpratcBtn add-to-cart">
+                              {{ block.settings.button_title }}
+                            </button>
+                            {% else if block.settings.variants=="view_details" %}
+                            <button class="hpratcBtn add-to-cart">
+                              <a href="{{ product.url }}">
+                                View Details
+                              </a>
+                            </button>
+  
+  
+                            {% endif %}
+  
+                          </div>
+                        </div>
+                      </div>
+  
+                      {% if block.settings.grid_type == 'static' %}
+                    </div>
+  
+                    {% else %}
+                  </div>
+                  {% endif %}
+  
+                  {% endfor %}
+                </div>
+              </div>
+  
+              {% if block.settings.grid_type == 'slider' %}
+              <div class="hprswiper-button-next">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1.40039 1.40002L7.00039 7.00002L1.40039 12.6" stroke="white" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+              <div class="hprswiper-button-prev">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6.59961 1.3999L0.999609 6.9999L6.59961 12.5999" stroke="white" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+              {% endif %}
+            </div>
+  
+          </div>
+        </div>
+      </div>
+</div>
+<div class="hprWrapper">
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+      <div class="hprContainer">
+        <div class="hprRow">
+          <div class="hprcol-12">
+            <h4 class="hprTitle">
+              {{ block.settings.combine_title }}
+            </h4>
+    
+            {% if block.settings.grid_type == 'static' %}
+            <div class="hprproductGridWrapper">
+              <div class="hprgrid{{ items_per_row }}">
+                {% else %}
+                <div class="swiper hprSwiper">
+                  <div class="swiper-wrapper">
+                    {% endif %}
+    
+                    {% for product in combine_products %}
+    
+                    {% if block.settings.grid_type == 'static' %}
+                    <div class="hprgridSingle">
+                      {% else %}
+                      <div class="swiper-slide">
+                        {% endif %}
+    
+                        <div class="hprCardWrapper">
+                          <div class="hprCardInner">
+                            <a href="{{ product.url }}">
+                              <figure class="figure-{{ block.settings.image_ratio }}">
+                                <img class=" product-image" src="{{ product.featured_image | img_url }}"
+                                alt="{{ product.title }}" />
+                                </figure>
+                                
+                                
+                              <div class="productContentHolder">
+                                {% if block.settings.show_vendor %}
+                                <div class="hprvendorName">
+                                  {{ product.vendor }}
+                                </div>
+                                {% endif %}
+                                <h5>
+                                  {{ product.title }}
+                                </h5>
+                                <div class="hprpriceWrapper">
+                                  <span class="hprproductPrice">
+                                    {{ product.price | money }}
+                                  </span>
+                                  <span class="hprcomparedAtPrice"> {{ product.first_available_variant.compare_at_price |
+                                    money}} </span>
+                                </div>
+                              </div>
+                            </a>
+                       
+                            <input type="hidden" value="{{ product.variants.size }}" class="num-variants" />
+                            <input type="hidden" value="{{ product.first_available_variant.id }}"
+                              class="first-variant-id" />
+                            <div class="selection_type">
+                              {% if block.settings.variants=="add_to_cart" %}
+                              {% assign numVariants = product.variants.size %}
+                              {% if numVariants == 1 %}
+    
+                              {% else %}
+                              <select class="select-variant" onchange="updatePrice(event)">
+                                {% for variant in product.variants %}
+                                {% if variant.title !="Default Title" %}
+                                <option data-price="{{ variant.price | money }}"
+                                  data-img="{{ variant.image.src  |  default: product.featured_image  |  image_url  }}"
+                                  value="{{variant.id}}">{{ variant.title }}</option>
+                                {% endif %}
+                                {% endfor %}
+                              </select>
+                              {%endif%}
+                              {% endif %}
+                            </div>
+                            <div class="addToCartHolder">
+    
+                              {% if block.settings.variants=="add_to_cart" %}
+                              <button onClick="addToCart(event)" class="hpratcBtn add-to-cart">
+                                {{ block.settings.button_title }}
+                              </button>
+                              {% else if block.settings.variants=="view_details" %}
+                              <button class="hpratcBtn add-to-cart">
+                                <a href="{{ product.url }}">
+                                  View Details
+                                </a>
+                              </button>
+    
+    
+                              {% endif %}
+    
+                            </div>
+                          </div>
+                        </div>
+    
+                        {% if block.settings.grid_type == 'static' %}
+                      </div>
+    
+                      {% else %}
+                    </div>
+                    {% endif %}
+    
+                    {% endfor %}
+                  </div>
+                </div>
+    
+                {% if block.settings.grid_type == 'slider' %}
+                <div class="hprswiper-button-next">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.40039 1.40002L7.00039 7.00002L1.40039 12.6" stroke="white" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </div>
+                <div class="hprswiper-button-prev">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.59961 1.3999L0.999609 6.9999L6.59961 12.5999" stroke="white" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </div>
+                {% endif %}
+              </div>
+    
+            </div>
+          </div>
+        </div>
+        </div>
+  
+
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const swiper = new Swiper(".hprSwiper", {
@@ -212,6 +467,18 @@
     "default": "Recommended Product"
     },
     {
+    "type": "text",
+    "id": "outfits_title",
+    "label": "Outfit Title",
+    "default": "Outfits Product"
+    },
+    {
+    "type": "text",
+    "id": "combine_title",
+    "label": "Combine Title",
+    "default": "Combined Product"
+    },
+    {
     "type": "checkbox",
     "id": "show_vendor",
     "label": "Show Vendor",
@@ -227,6 +494,24 @@
     { "value": "square", "label": "Square" }
     ],
     "default": "square"
+    },
+    {
+    "type": "select",
+    "id": "position",
+    "label": "Discount Position",
+    "options": [
+    { "value": "top_left", "label": "Top left" },
+    { "value": "top_right", "label": "Top right" },
+    { "value": "bottom_left", "label": "Bottom left" },
+    { "value": "bottom_right", "label": "Bottom right" }
+    ],
+    "default": "top_left"
+    },
+    {
+      "type":"checkbox",
+      "id": "show_discount",
+      "default": true ,
+      "label": "Show discount"
     },
     {
     "type": "header",
