@@ -23,7 +23,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
     const productQueryIds = JSON.parse(metafieldData?.value || "[]");
-    console.log(productQueryIds, "product query ids");
     if (!Array.isArray(productQueryIds) || productQueryIds.length === 0) {
       return json({
         success: true,

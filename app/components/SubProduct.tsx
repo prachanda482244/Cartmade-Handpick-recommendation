@@ -244,11 +244,11 @@ const SubProduct = ({
                     {subproductId.length !== 0 ? (
                       <div
                         onClick={() => {
-                          // setSubProductId(
-                          //   subproductId.length !== initialIds.length
-                          //     ? initialIds
-                          //     : [],
-                          // );
+                          setSubProductId(
+                            subproductId.length !== initialIds.length
+                              ? initialIds
+                              : [],
+                          );
                         }}
                         className="flex items-center gap-2 relative font-semibold"
                       >
@@ -306,7 +306,7 @@ const SubProduct = ({
                   <div className="flex  justify-between w-full items-center">
                     <div className="flex items-center  w-[80%]  px-1">
                       <motion.div
-                        className="cursor-pointer  px-2 py-1"
+                        className="cursor-move  px-2 py-1"
                         draggable={true}
                         onDragStart={(event: any) =>
                           handleDragStart(event, index)
