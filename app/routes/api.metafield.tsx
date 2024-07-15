@@ -38,9 +38,39 @@ export async function loader({ request }: LoaderFunctionArgs) {
     update: true,
   });
 
+  const GET_PRODUCTS_BY_IDS_QUERY = `
+  query GetProductsByIds($ids: [ID!]!) {
+    nodes(ids: $ids) {
+      ... on Product {
+        id
+        title
+        description
+        totalInventory
+        vendor
+        featuredImage {
+          url
+        }
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }`;
+
+  const response = await admin.graphql(GET_PRODUCTS_BY_IDS_QUERY, {
+    variables: {
+      ids: JSON.parse(metafield.value),
+    },
+  });
+  const products = await response.json();
+  const mainData = products.data.nodes;
+
   return json({
     success: true,
-    data: metafield,
+    data: mainData,
     message: "Meta field create succesfully",
   });
 }

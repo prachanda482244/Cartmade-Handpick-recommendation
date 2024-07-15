@@ -52,19 +52,6 @@ const DataTableComponent = ({
     setProductId(productId);
     setIsProductLoading(true);
 
-    // if (combineProductMetaId === undefined) {
-    //   setCombineProduct([]);
-    //   setOriginalCombineProduct([]);
-    // }
-    // if (outfitProductMetaId === undefined) {
-    //   setOutfitsProduct([]);
-    //   setOriginalOutfitProduct([]);
-    // }
-    // if (recommededProductMetaId === undefined) {
-    //   setSubProducts([]);
-    //   setOriginalProduct([]);
-    // }
-
     let obj = [];
     if (recommededProductMetaId !== undefined) {
       obj.push({
@@ -95,7 +82,6 @@ const DataTableComponent = ({
       data.forEach((result, index) => {
         const { key } = obj[index];
         const items = result.data.length ? result.data : [];
-        console.log(items);
         if (key === "recommended") {
           setSubProducts(items);
           setOriginalProduct(items);
@@ -111,65 +97,6 @@ const DataTableComponent = ({
       console.error("Error fetching metafield data:", error);
       setIsProductLoading(false);
     }
-
-    // try {
-    //   if (recommededProductMetaId !== undefined) {
-    //     const recommededProduct = await fetch(
-    //       `/api/fetchmetafield?productId=${productId}&metaFieldId=${recommededProductMetaId}`,
-    //     );
-    //     if (recommededProduct.ok) {
-    //       setIsProductLoading(false);
-    //       const { data } = await recommededProduct.json();
-    //       setSubProducts(data);
-    //       setOriginalProduct(data);
-    //     } else {
-    //       setIsProductLoading(false);
-    //       console.error(
-    //         "Failed to fetch metafield data:",
-    //         recommededProduct.statusText,
-    //       );
-    //     }
-    //   }
-    //   if (outfitProductMetaId !== undefined) {
-    //     const outfitProduct = await fetch(
-    //       `/api/fetchmetafield?productId=${productId}&metaFieldId=${outfitProductMetaId}`,
-    //     );
-
-    //     if (outfitProduct.ok) {
-    //       setIsProductLoading(false);
-    //       const { data } = await outfitProduct.json();
-    //       setOutfitsProduct(data);
-    //       setOriginalOutfitProduct(data);
-    //     } else {
-    //       setIsProductLoading(false);
-
-    //       console.error(
-    //         "Failed to fetch metafield data:",
-    //         outfitProduct.statusText,
-    //       );
-    //     }
-    //   }
-    //   if (combineProductMetaId !== undefined) {
-    //     const combineProduct = await fetch(
-    //       `/api/fetchmetafield?productId=${productId}&metaFieldId=${combineProductMetaId}`,
-    //     );
-    //     if (combineProduct.ok) {
-    //       setIsProductLoading(false);
-    //       const { data } = await combineProduct.json();
-    //       setCombineProduct(data);
-    //       setOriginalCombineProduct(data);
-    //     } else {
-    //       setIsProductLoading(false);
-    //       console.error(
-    //         "Failed to fetch metafield data:",
-    //         combineProduct.statusText,
-    //       );
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching metafield data:", error);
-    //   setIsProductLoading(false);
-    // }
   };
   useEffect(() => {
     fetchData({
@@ -187,7 +114,6 @@ const DataTableComponent = ({
     setActiveId(productId);
     const isCurrentlyExpanded = expandedRow === productId;
     setExpandedRow(isCurrentlyExpanded ? null : productId);
-
     if (!isCurrentlyExpanded && metafieldId) {
       const metaIds = metafieldId.map(
         ({
@@ -279,8 +205,8 @@ const DataTableComponent = ({
               <SubProduct
                 title="recommended product"
                 subProducts={subProducts}
+                setOriginalProduct={setOriginalProduct}
                 setSubProducts={setSubProducts}
-                fetchData={fetchData}
                 originalProduct={originalProduct}
                 mainId={id}
                 metaFieldNameSpace="custom"
@@ -291,8 +217,8 @@ const DataTableComponent = ({
                 title="outfit product"
                 subProducts={outfitsProduct}
                 setSubProducts={setOutfitsProduct}
-                fetchData={fetchData}
                 originalProduct={originalOutfitProduct}
+                setOriginalProduct={setOriginalOutfitProduct}
                 mainId={id}
                 metaFieldNameSpace="custom"
                 metaFieldKey="outfits"
@@ -301,8 +227,8 @@ const DataTableComponent = ({
               <SubProduct
                 title="combine product"
                 subProducts={combineProduct}
+                setOriginalProduct={setOriginalCombineProduct}
                 setSubProducts={setCombineProduct}
-                fetchData={fetchData}
                 originalProduct={originalCombineProduct}
                 mainId={id}
                 metaFieldNameSpace="custom"
