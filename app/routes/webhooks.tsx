@@ -16,6 +16,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       if (session) {
         await db.session.deleteMany({ where: { shop } });
       }
+      console.log("App uninstalled")
+  // const metafield = new admin.rest.resources.Metafield({ session: session });
+      
 
       break;
     case "CARTS_CREATED":

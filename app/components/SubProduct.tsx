@@ -55,10 +55,7 @@ const SubProduct = ({
       const updatedIds = updatedSubProducts.map(({ id }) => id);
       setUpdatedProductIds(updatedIds);
 
-      const hasOrderChanged = initialIds.some(
-        (id, idx) => updatedIds[idx] !== id,
-      );
-      setCondition(hasOrderChanged);
+      setCondition(initialIds.some((id, index) => updatedIds[index] !== id));
     }
   };
 
