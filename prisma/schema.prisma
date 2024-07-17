@@ -45,3 +45,9 @@ model RelatedProduct {
   mainProductId  Int
   relatedProductId Int
 }
+
+model RelatedProduct2 {
+  id             Int      @id @default(autoincrement())
+  mainProductId  Int
+  relatedProductId Int
+}
