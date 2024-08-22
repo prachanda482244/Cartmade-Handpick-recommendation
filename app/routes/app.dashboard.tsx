@@ -61,7 +61,6 @@ export const loader: LoaderFunction = async ({
 }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const { shop, accessToken } = session;
-
   try {
     const { data } = await axios.post(
       `https://${shop}/admin/api/${apiVersion}/graphql.json`,

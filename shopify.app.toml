@@ -3,7 +3,7 @@
 client_id = "a69bed013caa901b194eee84743dd670"
 name = "cartmade-handpick-up-recommend"
 handle = "cartmade-handpickup-1"
-application_url = "https://frankfurt-glossary-jar-instructional.trycloudflare.com"
+application_url = "https://outlook-midwest-venezuela-prohibited.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,17 +16,21 @@ direct_api_mode = "online"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "write_products read_products"
 
 [auth]
 redirect_urls = [
-  "https://frankfurt-glossary-jar-instructional.trycloudflare.com/auth/callback",
-  "https://frankfurt-glossary-jar-instructional.trycloudflare.com/auth/shopify/callback",
-  "https://frankfurt-glossary-jar-instructional.trycloudflare.com/api/auth/callback"
+  "https://outlook-midwest-venezuela-prohibited.trycloudflare.com/auth/callback",
+  "https://outlook-midwest-venezuela-prohibited.trycloudflare.com/auth/shopify/callback",
+  "https://outlook-midwest-venezuela-prohibited.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-04"
+
+  [[webhooks.subscriptions]]
+  uri = "https://motivated-tree-fan-introduction.trycloudflare.com"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
 
 [pos]
 embedded = false

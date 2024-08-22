@@ -112,15 +112,15 @@ const DataTableComponent = ({
     metafieldId: string[] | any,
   ) => {
     setActiveId(productId);
-    if(metafieldId===undefined){
-      setSubProducts([])
-      setOriginalProduct([])
+    if (metafieldId === undefined) {
+      setSubProducts([]);
+      setOriginalProduct([]);
 
-      setCombineProduct([])
-      setOriginalCombineProduct([])
+      setCombineProduct([]);
+      setOriginalCombineProduct([]);
 
-      setOutfitsProduct([])
-      setOriginalOutfitProduct([])
+      setOutfitsProduct([]);
+      setOriginalOutfitProduct([]);
     }
     const isCurrentlyExpanded = expandedRow === productId;
     setExpandedRow(isCurrentlyExpanded ? null : productId);
