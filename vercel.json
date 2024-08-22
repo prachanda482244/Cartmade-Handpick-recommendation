@@ -11,7 +11,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/build"
+      "dest": "/build/server/index.js"
     }
   ]
 }
