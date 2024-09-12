@@ -3,7 +3,7 @@
 client_id = "a69bed013caa901b194eee84743dd670"
 name = "cartmade-handpick-up-recommend"
 handle = "cartmade-handpickup-1"
-application_url = "https://translator-projectors-subsequently-pontiac.trycloudflare.com"
+application_url = "https://cartmade-handpick-5d8090a645c0.herokuapp.com/"
 embedded = true
 
 [build]
@@ -20,9 +20,9 @@ scopes = "write_products read_products"
 
 [auth]
 redirect_urls = [
-  "https://translator-projectors-subsequently-pontiac.trycloudflare.com/auth/callback",
-  "https://translator-projectors-subsequently-pontiac.trycloudflare.com/auth/shopify/callback",
-  "https://translator-projectors-subsequently-pontiac.trycloudflare.com/api/auth/callback"
+  "https://cartmade-handpick-5d8090a645c0.herokuapp.com/auth/callback",
+  "https://cartmade-handpick-5d8090a645c0.herokuapp.com/auth/shopify/callback",
+  "https://cartmade-handpick-5d8090a645c0.herokuapp.com/api/auth/callback"
 ]
 
 [webhooks]
