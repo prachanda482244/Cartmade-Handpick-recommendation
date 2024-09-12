@@ -3,7 +3,7 @@
 client_id = "a69bed013caa901b194eee84743dd670"
 name = "cartmade-handpick-up-recommend"
 handle = "cartmade-handpickup-1"
-application_url = "https://nickel-sierra-glow-webcams.trycloudflare.com"
+application_url = "https://translator-projectors-subsequently-pontiac.trycloudflare.com"
 embedded = true
 
 [build]
@@ -20,9 +20,9 @@ scopes = "write_products read_products"
 
 [auth]
 redirect_urls = [
-  "https://nickel-sierra-glow-webcams.trycloudflare.com/auth/callback",
-  "https://nickel-sierra-glow-webcams.trycloudflare.com/auth/shopify/callback",
-  "https://nickel-sierra-glow-webcams.trycloudflare.com/api/auth/callback"
+  "https://translator-projectors-subsequently-pontiac.trycloudflare.com/auth/callback",
+  "https://translator-projectors-subsequently-pontiac.trycloudflare.com/auth/shopify/callback",
+  "https://translator-projectors-subsequently-pontiac.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
